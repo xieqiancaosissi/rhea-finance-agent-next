@@ -8,7 +8,8 @@
     "build": "next build && make-agent deploy -u https://rhea-lending-ai.vercel.app",
     "build:deploy": "next build && make-agent deploy -u https://agent-next-boilerplate.vercel.app",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "prettier:fix": "prettier --write src"
   },
   "dependencies": {
     "@bitte-ai/agent-sdk": "^0.1.9",
@@ -16,6 +17,7 @@
     "near-api-js": "^5.1.1",
     "near-safe": "^0.9.12",
     "next": "^15.2.4",
+    "prettier": "2.3.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "redoc": "^2.4.0",
