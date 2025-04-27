@@ -1,6 +1,7 @@
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
 
 export async function register(account_id: string) {
+  return null;
   const query = await fetch(
     `${RHEA_LENDING_INTERFACE_DOMAIN}/storage_balance_of`,
     {
