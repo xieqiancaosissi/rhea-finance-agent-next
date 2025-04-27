@@ -31,6 +31,7 @@ export async function GET() {
                    
                     2.If the user supplies a token and does not specify whether collateral is required, 
                       the user is prompted to select whether collateral is required.
+                      except BRRR, and BRRR can only be false.
 
                     3. If the user want to repay and the user does not specify the repay type, tell the user which repay method to choose. 
                        There are two options: wallet and supplied.
