@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       },
     ]);
     if (errorTip) {
-      return NextResponse.json({ error: errorTip }, { status: 400 });
+      return NextResponse.json({ data: errorTip }, { status: 200 });
     }
     const transactions = [];
     const register_tx = await register(account_id as string);

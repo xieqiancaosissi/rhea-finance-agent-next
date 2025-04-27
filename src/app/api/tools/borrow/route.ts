@@ -42,7 +42,23 @@ export async function GET(request: NextRequest) {
       },
     ]);
     if (errorTip) {
-      return NextResponse.json({ error: errorTip }, { status: 400 });
+      return NextResponse.json({ data: errorTip }, { status: 200 });
+    }
+    const max_burrow_res = await fetch(
+      `${RHEA_LENDING_INTERFACE_DOMAIN}/max_burrow_balance/${account_id}/${token_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const max_borrow = await max_burrow_res.json();
+    if (Decimal(max_borrow.data || 0).lt(amount || 0)) {
+      return NextResponse.json(
+        { data: `The maximum amount you can borrow is ${max_borrow.data}` },
+        { status: 200 }
+      );
     }
     const transactions = [];
     const register_result = await register(account_id as string);

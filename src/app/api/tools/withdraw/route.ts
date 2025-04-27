@@ -42,7 +42,23 @@ export async function GET(request: NextRequest) {
       },
     ]);
     if (errorTip) {
-      return NextResponse.json({ error: errorTip }, { status: 400 });
+      return NextResponse.json({ data: errorTip }, { status: 200 });
+    }
+    const max_withdraw_res = await fetch(
+      `${RHEA_LENDING_INTERFACE_DOMAIN}/max_withdraw_balance/${account_id}/${token_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const max_withdraw = await max_withdraw_res.json();
+    if (Decimal(max_withdraw.data || 0).lt(amount || 0)) {
+      return NextResponse.json(
+        { data: `The maximum amount you can withdraw is ${max_withdraw.data}` },
+        { status: 200 }
+      );
     }
     const transactions = [];
     const register_result = await register(account_id as string);

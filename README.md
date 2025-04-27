@@ -139,9 +139,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 MIT License
-<!-- 
-(1) 对用户操作的数量进行校验？
-(2) 每一种资产是否可以用作抵押，需要查询资产的配置情况， BRRR，不可以抵押，不用提示
-(3) 增加操作全部数量的 查询操作
- -->
-

@@ -43,7 +43,25 @@ export async function GET(request: NextRequest) {
       },
     ]);
     if (errorTip) {
-      return NextResponse.json({ error: errorTip }, { status: 400 });
+      return NextResponse.json({ data: errorTip }, { status: 200 });
+    }
+    const max_supply_res = await fetch(
+      `${RHEA_LENDING_INTERFACE_DOMAIN}/max_supply_balance/${account_id}/${token_id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const max_supply = await max_supply_res.json();
+    if (Decimal(max_supply.data || 0).lt(amount || 0)) {
+      return NextResponse.json(
+        {
+          data: `The balance is insufficient. The maximum amount you can supply is ${max_supply.data}`,
+        },
+        { status: 200 }
+      );
     }
     const transactions = [];
     const register_tx = await register(account_id as string);

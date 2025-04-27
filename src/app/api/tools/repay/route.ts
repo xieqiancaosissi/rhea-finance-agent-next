@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
       },
     ]);
     if (errorTip) {
-      return NextResponse.json({ error: errorTip }, { status: 400 });
+      return NextResponse.json({ data: errorTip }, { status: 200 });
     }
     const transactions = [];
     const register_result = await register(account_id as string);
@@ -53,6 +53,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(transactions);
     } else {
       if (from == "wallet") {
+        const max_repay_from_wallet_res = await fetch(
+          `${RHEA_LENDING_INTERFACE_DOMAIN}/max_repay_from_wallet/${account_id}/${token_id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const max_repay = await max_repay_from_wallet_res.json();
+        if (Decimal(max_repay.data || 0).lt(amount || 0)) {
+          return NextResponse.json(
+            { data: `The maximum amount you can repay is ${max_repay.data}` },
+            { status: 200 }
+          );
+        }
         if (token_id == wnear_contract_id) {
           const near_deposit_tx = nearDepositTranstion(account_id, amount!);
           transactions.push(near_deposit_tx);
@@ -76,6 +92,22 @@ export async function GET(request: NextRequest) {
         console.log("---------transactions------", transactions);
         return NextResponse.json(transactions);
       } else if (from == "supplied") {
+        const max_repay_from_account_res = await fetch(
+          `${RHEA_LENDING_INTERFACE_DOMAIN}/max_repay_from_account/${account_id}/${token_id}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const max_repay = await max_repay_from_account_res.json();
+        if (Decimal(max_repay.data || 0).lt(amount || 0)) {
+          return NextResponse.json(
+            { data: `The maximum amount you can repay is ${max_repay.data}` },
+            { status: 200 }
+          );
+        }
         const res = await fetch(
           `${RHEA_LENDING_INTERFACE_DOMAIN}/repay_from_supplied`,
           {
