@@ -66,6 +66,11 @@ export async function GET() {
                                 "decimals": 24,
                             },
                             {
+                                "symbol": "NEAR",
+                                "token": "wrap.near",
+                                "decimals": 24,
+                            },
+                            {
                                 "symbol": "STNEAR",
                                 "token": "meta-pool.near",
                                 "decimals": 24,

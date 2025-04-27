@@ -1,11 +1,12 @@
 import { NextResponse, NextRequest } from "next/server";
 import Decimal from "decimal.js";
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
-import { expandTokenDecimal } from "@/app/utils/tokens";
+import { expandTokenDecimal, wnear_contract_id } from "@/app/utils/common";
 import {
   register,
   validateParams,
   transferToTranstions,
+  nearDepositTranstion,
 } from "@/app/utils/common";
 
 export async function GET(request: NextRequest) {
@@ -48,6 +49,10 @@ export async function GET(request: NextRequest) {
     const register_tx = await register(account_id as string);
     if (register_tx) {
       transactions.push(register_tx);
+    }
+    if (token_id == wnear_contract_id) {
+      const near_deposit_tx = nearDepositTranstion(account_id, amount!);
+      transactions.push(near_deposit_tx);
     }
     const res = await fetch(`${RHEA_LENDING_INTERFACE_DOMAIN}/supply`, {
       method: "POST",

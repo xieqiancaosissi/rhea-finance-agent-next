@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
 import Decimal from "decimal.js";
-import { expandTokenDecimal } from "@/app/utils/tokens";
+import { expandTokenDecimal } from "@/app/utils/common";
 import {
   register,
   validateParams,

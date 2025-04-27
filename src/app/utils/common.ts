@@ -1,4 +1,5 @@
 import { utils } from "near-api-js";
+import Decimal from "decimal.js";
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
 interface IResult {
   code: string;
@@ -10,6 +11,7 @@ interface IResult {
   msg: string;
 }
 const burrow_main_contract_id = "contract.main.burrow.near";
+export const wnear_contract_id = "wrap.near";
 export async function register(account_id: string) {
   const query = await fetch(
     `${RHEA_LENDING_INTERFACE_DOMAIN}/storage_balance_of`,
@@ -54,6 +56,12 @@ export function validateParams(params: Record<string, string>[]) {
   if (empty) return empty.errorTip;
   return "";
 }
+export const expandTokenDecimal = (
+  value: string | number | Decimal,
+  decimals: string | number
+): Decimal => {
+  return new Decimal(value).mul(new Decimal(10).pow(decimals));
+};
 
 export function transferToTranstions(result: IResult, account_id: string) {
   const transaction = {
@@ -65,6 +73,49 @@ export function transferToTranstions(result: IResult, account_id: string) {
         params: {
           methodName: result.data.method_name,
           args: result.data.args || {},
+          gas: "100000000000000",
+          deposit: "1",
+        },
+      },
+    ],
+  };
+  return transaction;
+}
+
+export function nearDepositTranstion(account_id: string, amount: string) {
+  const transaction = {
+    signerId: account_id,
+    receiverId: wnear_contract_id,
+    actions: [
+      {
+        type: "FunctionCall",
+        params: {
+          methodName: "near_deposit",
+          args: {},
+          gas: "100000000000000",
+          deposit: utils.format.parseNearAmount(amount),
+        },
+      },
+    ],
+  };
+  return transaction;
+}
+
+export function nearWithdrawTranstion(account_id: string, amount: string) {
+  const transaction = {
+    signerId: account_id,
+    receiverId: wnear_contract_id,
+    actions: [
+      {
+        type: "FunctionCall",
+        params: {
+          methodName: "near_withdraw",
+          args: {
+            amount: expandTokenDecimal(amount, 24).toFixed(
+              0,
+              Decimal.ROUND_DOWN
+            ),
+          },
           gas: "100000000000000",
           deposit: "1",
         },

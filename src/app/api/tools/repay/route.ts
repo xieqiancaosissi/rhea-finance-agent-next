@@ -1,11 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
 import Decimal from "decimal.js";
-import { expandTokenDecimal } from "@/app/utils/tokens";
+import { expandTokenDecimal } from "@/app/utils/common";
 import {
   register,
   validateParams,
   transferToTranstions,
+  wnear_contract_id,
+  nearDepositTranstion,
 } from "@/app/utils/common";
 
 export async function GET(request: NextRequest) {
@@ -51,6 +53,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(transactions);
     } else {
       if (from == "wallet") {
+        if (token_id == wnear_contract_id) {
+          const near_deposit_tx = nearDepositTranstion(account_id, amount!);
+          transactions.push(near_deposit_tx);
+        }
         const res = await fetch(
           `${RHEA_LENDING_INTERFACE_DOMAIN}/repay_from_wallet`,
           {

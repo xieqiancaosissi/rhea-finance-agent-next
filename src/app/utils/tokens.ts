@@ -1,4 +1,3 @@
-import Decimal from "decimal.js";
 const tokens = {
   code: "0",
   data: [
@@ -406,12 +405,5 @@ const support_tokens = [
     decimals: 18,
   },
 ];
-
-export const expandTokenDecimal = (
-  value: string | number | Decimal,
-  decimals: string | number
-): Decimal => {
-  return new Decimal(value).mul(new Decimal(10).pow(decimals));
-};
 
 export { tokens, support_tokens };
