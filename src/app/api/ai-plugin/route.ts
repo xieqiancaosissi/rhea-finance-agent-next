@@ -29,30 +29,16 @@ export async function GET() {
                       /api/tools/repay: repay token borrowed from lending.
                       /api/tools/withdraw: withdraw token from lending.
                    
-                    2. Transaction generation rules:
-                       The data format returned by the interface is as follows:
-                       {"result":{"code":"0","data":{"amount":1,"args":{"amount":"100000","msg":"{\"Execute\": {\"actions\": [{\"Repay\": {\"max_amount\": \"100000000000000000\", \"token_id\": \"17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1\"}}]}}","receiver_id":"contract.main.burrow.near"},"contract_id":"17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1","method_name":"ft_transfer_call"},"msg":"success"}}
-                       
-                       When you generate a transaction, the transaction information must be obtained strictly from the information returned by the interface.
-                       {
-                         signerId: "Wallet User Id", // The source of information is the login wallet
-                         receiverId: result.contract_id, // The source of information is the interface
-                         actions: [{
-                            methodName: result.method_name, // The source of information is the interface
-                            args: result.data.args  // The source of information is the interface
-                            gas: result.gas ? new BN(result.gas) : new BN("100000000000000");  // The source of information is the interface
-                         }]
-                       }
-                    3.If the user supplies a token and does not specify whether collateral is required, 
-                     the user is prompted to select whether collateral is required.
+                    2.If the user supplies a token and does not specify whether collateral is required, 
+                      the user is prompted to select whether collateral is required.
 
-                    4.If the user want to repay and the user does not specify the repay type, tell the user which repay method to choose. 
-                      There are two options: wallet and supplied.
+                    3. If the user want to repay and the user does not specify the repay type, tell the user which repay method to choose. 
+                       There are two options: wallet and supplied.
 
-                    5. If the user wants to adjust the collateral of the token and no adjustment way is specified, tell the user
+                    4. If the user wants to adjust the collateral of the token and no adjustment way is specified, tell the user
                        There are two options: increase and decrease. 
                        
-                    6. All tokens supported by the lending platform:
+                    5. All tokens supported by the lending platform:
                         [
                             {
                                 "symbol": "BRRR",
@@ -140,15 +126,13 @@ export async function GET() {
                        This information does not need to be given by the user and is passed to the interface as a query parameter.  
 
                     7. Interface parameter prompt rules:
-                       The user input information needs to be strictly checked. If the interface requires parameters, the current user does not provide,
-                       that is, the parameters of required:true, the user must be prompted to provide the corresponding data, 
+                       The user input information needs to be strictly checked. If the interface requires parameters, 
+                       the current user does not provide,that is,
+                       the parameters of required:true, the user must be prompted to provide the corresponding data, 
                        otherwise the transaction cannot be generated.    
 
                     8. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.   
 
-                    9. If the method to be executed for the returned transaction is storage_deposit
-                       Give the user a reminder that this is your first time using lending, 
-                       so you need to complete the registration before any operation
                 `,
         tools: [{ type: "generate-transaction" }],
         image: "https://img.ref.finance/images/rhea_logo_svg.svg",

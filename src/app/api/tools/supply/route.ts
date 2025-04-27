@@ -2,7 +2,11 @@ import { NextResponse, NextRequest } from "next/server";
 import Decimal from "decimal.js";
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
 import { expandTokenDecimal } from "@/app/utils/tokens";
-import { register } from "@/app/utils/common";
+import {
+  register,
+  validateParams,
+  transferToTranstions,
+} from "@/app/utils/common";
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,44 +27,44 @@ export async function GET(request: NextRequest) {
       0,
       Decimal.ROUND_DOWN
     );
-    if (!account_id) {
-      return NextResponse.json(
-        { error: "Need to log in first" },
-        { status: 400 }
-      );
+    const errorTip = validateParams([
+      {
+        value: account_id,
+        errorTip: "Need to log in first",
+      },
+      {
+        value: token_id,
+        errorTip: "token_id parameter is required",
+      },
+      {
+        value: decimals,
+        errorTip: "decimals parameter is required",
+      },
+    ]);
+    if (errorTip) {
+      return NextResponse.json({ error: errorTip }, { status: 400 });
     }
-    const register_result = await register(account_id as string);
-    if (register_result) {
-      return NextResponse.json(register_result);
-    } else {
-      if (!token_id) {
-        return NextResponse.json(
-          { error: "token_id parameter is required" },
-          { status: 400 }
-        );
-      }
-      if (!decimals) {
-        return NextResponse.json(
-          { error: "decimals parameter is required" },
-          { status: 400 }
-        );
-      }
-
-      const res = await fetch(`${RHEA_LENDING_INTERFACE_DOMAIN}/supply`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          token_id,
-          amount: amountExpand,
-          is_collateral: is_collateral == "true" ? true : false,
-        }),
-      });
-      const result = await res.json();
-      console.log("---------result", result);
-      return NextResponse.json(result);
+    const transactions = [];
+    const register_tx = await register(account_id as string);
+    if (register_tx) {
+      transactions.push(register_tx);
     }
+    const res = await fetch(`${RHEA_LENDING_INTERFACE_DOMAIN}/supply`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token_id,
+        amount: amountExpand,
+        is_collateral: is_collateral == "true" ? true : false,
+      }),
+    });
+    const result = await res.json();
+    const tx = transferToTranstions(result, account_id);
+    transactions.push(tx);
+    console.log("---------transactions-----", transactions);
+    return NextResponse.json(transactions);
   } catch (error) {
     console.error("Error supply", error);
     return NextResponse.json({ error: "Failed to supply" }, { status: 500 });

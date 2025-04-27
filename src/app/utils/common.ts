@@ -1,5 +1,15 @@
+import { utils } from "near-api-js";
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
-
+interface IResult {
+  code: string;
+  data: {
+    args: Record<string, any>;
+    contract_id: string;
+    method_name: string;
+  };
+  msg: string;
+}
+const burrow_main_contract_id = "contract.main.burrow.near";
 export async function register(account_id: string) {
   const query = await fetch(
     `${RHEA_LENDING_INTERFACE_DOMAIN}/storage_balance_of`,
@@ -9,29 +19,57 @@ export async function register(account_id: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        token_id: "contract.main.burrow.near",
+        token_id: burrow_main_contract_id,
         account_id,
       }),
     }
   );
   const query_reault = await query.json();
   if (!query_reault.data) {
-    const res = await fetch(
-      `${RHEA_LENDING_INTERFACE_DOMAIN}/storage_deposit`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    const transaction = {
+      signerId: account_id,
+      receiverId: burrow_main_contract_id,
+      actions: [
+        {
+          type: "FunctionCall",
+          params: {
+            methodName: "storage_deposit",
+            args: {
+              account_id,
+              registration_only: false,
+            },
+            gas: "100000000000000",
+            deposit: utils.format.parseNearAmount("0.1"),
+          },
         },
-        body: JSON.stringify({
-          token_id: "contract.main.burrow.near",
-          amount: 0.1,
-          account_id,
-        }),
-      }
-    );
-    const result = await res.json();
-    return result;
+      ],
+    };
+    return transaction;
   }
   return null;
+}
+
+export function validateParams(params: Record<string, string>[]) {
+  const empty = params.find((param) => !param.value);
+  if (empty) return empty.errorTip;
+  return "";
+}
+
+export function transferToTranstions(result: IResult, account_id: string) {
+  const transaction = {
+    signerId: account_id,
+    receiverId: result.data.contract_id,
+    actions: [
+      {
+        type: "FunctionCall",
+        params: {
+          methodName: result.data.method_name,
+          args: result.data.args || {},
+          gas: "100000000000000",
+          deposit: "1",
+        },
+      },
+    ],
+  };
+  return transaction;
 }
