@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
     const amount = searchParams.get("amount");
     const type = searchParams.get("type");
     const decimals = searchParams.get("decimals");
-    const account_id = searchParams.get("account_id");
+    const headersList = request.headers;
+    const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
+    const account_id = mbMetadata?.accountId;
     const amountExpand = expandTokenDecimal(amount || 0, decimals || 0).toFixed(
       0,
       Decimal.ROUND_DOWN
@@ -21,6 +23,12 @@ export async function GET(request: NextRequest) {
     console.log("---------type", type);
     console.log("---------decimals", decimals);
     console.log("---------account_id", account_id);
+    if (!account_id) {
+      return NextResponse.json(
+        { error: "Need to log in first" },
+        { status: 400 }
+      );
+    }
     const register_result = await register(account_id as string);
     if (register_result) {
       return NextResponse.json(register_result);

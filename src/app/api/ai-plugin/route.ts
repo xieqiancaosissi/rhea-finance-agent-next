@@ -162,15 +162,6 @@ export async function GET() {
           operationId: "supply-token",
           parameters: [
             {
-              name: "account_id",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The account id of the login in user",
-            },
-            {
               name: "token_id",
               in: "query",
               required: true,
@@ -288,15 +279,6 @@ export async function GET() {
           operationId: "borrow-token",
           parameters: [
             {
-              name: "account_id",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The account id of the login in user",
-            },
-            {
               name: "token_id",
               in: "query",
               required: true,
@@ -401,15 +383,6 @@ export async function GET() {
           description: "Withdraw token from lending",
           operationId: "withdraw-token",
           parameters: [
-            {
-              name: "account_id",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The account id of the login in user",
-            },
             {
               name: "token_id",
               in: "query",
@@ -543,15 +516,6 @@ export async function GET() {
           operationId: "repay-token",
           parameters: [
             {
-              name: "account_id",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The account id of the login in user",
-            },
-            {
               name: "token_id",
               in: "query",
               required: true,
@@ -674,15 +638,6 @@ export async function GET() {
             "Adjust the amount of collateral, Users can increase or decrease the amount of collateral",
           operationId: "adjust-collateral-token",
           parameters: [
-            {
-              name: "account_id",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The account id of the login in user",
-            },
             {
               name: "token_id",
               in: "query",
