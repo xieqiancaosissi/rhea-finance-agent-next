@@ -73,6 +73,7 @@ export async function GET(request: NextRequest) {
         },
         body: JSON.stringify({
           token_id,
+          account_id,
           amount: amountExpand,
         }),
       });

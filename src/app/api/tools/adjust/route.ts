@@ -46,7 +46,33 @@ export async function GET(request: NextRequest) {
       transactions.push(register_tx);
       return NextResponse.json(transactions);
     } else {
+      const max_adjust_res = await fetch(
+        `${RHEA_LENDING_INTERFACE_DOMAIN}/max_adjust_balance/${account_id}/${token_id}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const max_adjust = await max_adjust_res.json();
+      const { data, collateral_data } = max_adjust;
+      const un_collateral_data = new Decimal(data || 0).minus(
+        collateral_data || 0
+      );
+      // console.log('-------------collateral_data', collateral_data);
+      // console.log('-------------un_collateral_data', un_collateral_data.toFixed());
       if (type == "increase") {
+        if (new Decimal(un_collateral_data).lt(amount || 0)) {
+          return NextResponse.json(
+            {
+              data: `You can increase the maximum amount by up to ${un_collateral_data.toFixed(
+                5
+              )}`,
+            },
+            { status: 200 }
+          );
+        }
         const res = await fetch(
           `${RHEA_LENDING_INTERFACE_DOMAIN}/increase_collateral`,
           {
@@ -66,6 +92,16 @@ export async function GET(request: NextRequest) {
         console.log("---------transactions----increase", result);
         return NextResponse.json(transactions);
       } else if (type == "decrease") {
+        if (new Decimal(collateral_data).lt(amount || 0)) {
+          return NextResponse.json(
+            {
+              data: `You can decrease the maximum amount by up to ${new Decimal(
+                collateral_data || 0
+              ).toFixed(5)}`,
+            },
+            { status: 200 }
+          );
+        }
         const res = await fetch(
           `${RHEA_LENDING_INTERFACE_DOMAIN}/decrease_collateral`,
           {
