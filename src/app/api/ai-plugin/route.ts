@@ -1,4 +1,4 @@
-import { ACCOUNT_ID, PLUGIN_URL } from "@/app/config";
+import { ACCOUNT_ID, PLUGIN_URL } from "@/config";
 import { NextResponse } from "next/server";
 
 export async function GET() {

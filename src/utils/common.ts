@@ -1,6 +1,6 @@
 import { utils } from "near-api-js";
 import Decimal from "decimal.js";
-import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
+import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/config";
 interface IResult {
   code: string;
   data: {

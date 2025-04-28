@@ -1,14 +1,14 @@
 import { NextResponse, NextRequest } from "next/server";
-import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
+import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/config";
 import Decimal from "decimal.js";
-import { expandTokenDecimal } from "@/app/utils/common";
+import { expandTokenDecimal } from "@/utils/common";
 import {
   register,
   validateParams,
   transferToTranstions,
   wnear_contract_id,
   nearDepositTranstion,
-} from "@/app/utils/common";
+} from "@/utils/common";
 
 export async function GET(request: NextRequest) {
   try {

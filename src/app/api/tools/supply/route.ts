@@ -1,13 +1,13 @@
 import { NextResponse, NextRequest } from "next/server";
 import Decimal from "decimal.js";
-import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/app/config";
-import { expandTokenDecimal, wnear_contract_id } from "@/app/utils/common";
+import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/config";
+import { expandTokenDecimal, wnear_contract_id } from "@/utils/common";
 import {
   register,
   validateParams,
   transferToTranstions,
   nearDepositTranstion,
-} from "@/app/utils/common";
+} from "@/utils/common";
 
 export async function GET(request: NextRequest) {
   try {
@@ -63,6 +63,7 @@ export async function GET(request: NextRequest) {
         { status: 200 }
       );
     }
+
     const transactions = [];
     const register_tx = await register(account_id as string);
     if (register_tx) {
