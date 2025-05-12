@@ -12,16 +12,11 @@ import {
   transformTransactions,
   getPriceImpact,
   getExpectedOutputFromSwapTodos,
-  type EstimateSwapView,
-  type Pool,
-  type TransformedTransaction,
 } from "rhea-dex-swap-sdk";
+import type { EstimateSwapView, Pool } from "rhea-dex-swap-sdk";
 
 import { searchToken } from "@/utils/search-token";
 import { getSlippageTolerance } from "@/utils/slippage";
-
-export const maxDuration = 60;
-export const dynamic = "force-dynamic";
 
 const REFERRAL_ID = "bitte.near";
 
@@ -57,12 +52,15 @@ export async function GET(request: NextRequest) {
 
     const tokenInMatch = searchToken(tokenIn!)[0];
     const tokenOutMatch = searchToken(tokenOut!)[0];
-    console.log('--------------------tokenInMatch', tokenInMatch.id);
-    console.log('--------------------tokenOutMatch', tokenOutMatch.id);
+    console.log("--------------------tokenInMatch", tokenInMatch.id);
+    console.log("--------------------tokenOutMatch", tokenOutMatch.id);
     if (!tokenInMatch || !tokenOutMatch) {
-      return {
-        error: `Unable to find token(s) tokenInMatch: ${tokenInMatch?.name} tokenOutMatch: ${tokenOutMatch?.name}`,
-      };
+      return NextResponse.json(
+        {
+          error: `Unable to find token(s) tokenInMatch: ${tokenInMatch?.name} tokenOutMatch: ${tokenOutMatch?.name}`,
+        },
+        { status: 500 }
+      );
     }
 
     const [tokenInData, tokenOutData] = await Promise.all([
@@ -71,21 +69,36 @@ export async function GET(request: NextRequest) {
     ]);
 
     if (tokenInData.id === WRAP_NEAR_CONTRACT_ID && isNearOut) {
-      return transformTransactions(
-        [nearWithdrawTransaction(quantity!)],
-        accountId
+      return NextResponse.json(
+        {
+          transactions: transformTransactions(
+            [nearWithdrawTransaction(quantity!)],
+            accountId
+          ),
+        },
+        { status: 200 }
       );
     }
 
     if (isNearIn && tokenOutData.id === WRAP_NEAR_CONTRACT_ID) {
-      return transformTransactions(
-        [nearDepositTransaction(quantity!)],
-        accountId
+      return NextResponse.json(
+        {
+          transactions: transformTransactions(
+            [nearDepositTransaction(quantity!)],
+            accountId
+          ),
+        },
+        { status: 200 }
       );
     }
 
     if (tokenInData.id === tokenOutData.id && isNearIn === isNearOut) {
-      return { error: "TokenIn and TokenOut cannot be the same" };
+      return NextResponse.json(
+        {
+          error: "TokenIn and TokenOut cannot be the same",
+        },
+        { status: 500 }
+      );
     }
 
     const refEstimateSwap = (enableSmartRouting: boolean) => {
@@ -153,7 +166,8 @@ export async function GET(request: NextRequest) {
       amountOut: expectAmountOut,
       stablePools: nonDegenStablePoolsDetails,
     });
-    const priceImpactDisplay = new Decimal(priceImpact).toFixed(2, Decimal.ROUND_HALF_CEIL) + "%";
+    const priceImpactDisplay =
+      new Decimal(priceImpact).toFixed(2, Decimal.ROUND_HALF_CEIL) + "%";
     return NextResponse.json({
       transactions: transformTransactions(refSwapTransactions, accountId),
       priceImpact: priceImpactDisplay,

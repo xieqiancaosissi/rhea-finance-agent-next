@@ -4,7 +4,7 @@ import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/config";
 interface IResult {
   code: string;
   data: {
-    args: Record<string, any>;
+    args: Record<string, unknown>;
     contract_id: string;
     method_name: string;
   };

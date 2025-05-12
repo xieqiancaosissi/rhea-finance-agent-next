@@ -1,9 +1,8 @@
-import Fuse, { type IFuseOptions } from "fuse.js";
+import Fuse from "fuse.js";
+import type { IFuseOptions } from "fuse.js";
 
-import {
-  allowlistedTokens,
-  type AllowlistedToken,
-} from "@/utils/allowlist-tokens";
+import { allowlistedTokens } from "@/utils/allowlist-tokens";
+import type { AllowlistedToken } from "@/utils/allowlist-tokens";
 
 // Create an array of tokens
 const tokens = Object.values(allowlistedTokens);
