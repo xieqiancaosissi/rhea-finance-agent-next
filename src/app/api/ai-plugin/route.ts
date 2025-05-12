@@ -5,9 +5,9 @@ export async function GET() {
   const pluginData = {
     openapi: "3.0.0",
     info: {
-      title: "Rhea lending API",
+      title: "Rhea finance API",
       description:
-        "APIs used to perform supply, borrow, withdraw, adjust, and repay operations on a lending platform.",
+        "APIs used to perform supply, borrow, withdraw, adjust, repay and swap operations on Rhea finance.",
       version: "1.0.0",
     },
     servers: [
@@ -18,16 +18,17 @@ export async function GET() {
     "x-mb": {
       "account-id": ACCOUNT_ID,
       assistant: {
-        name: "Rhea lending",
+        name: "Rhea finance",
         description:
-          "an assistant that helps users perform operations such as supply, borrow, repay, adjust, and withdraw on the Rhea Lending platform. By supplying assets, users can earn farm rewards offered by the platform, and through the borrow operation, users can borrow the assets they need.",
+          "an assistant that helps users perform operations such as supply, borrow, repay, adjust, withdraw, swap on the Rhea finance platform. e.g. By supplying assets, users can earn farm rewards offered by the platform, through the borrow operation, users can borrow the assets they need, and swap token",
         instructions: `
                     1. API Endpoint Usage:
-                      /api/tools/supply: Supply token to lending.
-                      /api/tools/borrow: Borrow token from lending.
+                      /api/tools/supply: Supply token.
+                      /api/tools/borrow: Borrow token.
                       /api/tools/adjust: Adjust token collateral.
-                      /api/tools/repay: repay token borrowed from lending.
-                      /api/tools/withdraw: withdraw token from lending.
+                      /api/tools/repay: repay token borrowed.
+                      /api/tools/withdraw: withdraw token.
+                      /api/tools/swap: swaps token。
                    
                     2.If the user supplies a token and does not specify whether collateral is required, 
                       the user is prompted to select whether collateral is required.
@@ -39,7 +40,7 @@ export async function GET() {
                     4. If the user wants to adjust the collateral of the token and no adjustment way is specified, tell the user
                        There are two options: increase and decrease. 
                        
-                    5. All tokens supported by the lending platform:
+                    5. If the user performs a supply, borrow, adjust, repay, or withdraw operation, only the following tokens are supported. If the user performs a swap operation, this instruction can be ignored.
                         [
                             {
                                 "symbol": "BRRR",
@@ -125,20 +126,21 @@ export async function GET() {
                        (1) This list provides the token symbol, token id, and token decimals.
                            The token_id and decimals information required by the interface can be obtained from here.
                        (2) If the token entered by the user is not supported, 
-                           the user will be prompted that the token is not within the range supported by lending,
+                           the user will be prompted that the token is not within the range supported by your operation,
                            And show the supported tokens to the user
 
-                    6. Please help me query the decimals of the operation token. 
+                    6. If the user is performing a swap operation:
+                       Get information for a given fungible token or swaps one token for another. Do not modify token identifiers, they will be fuzzy matched automatically.
+                    7. Please help me query the decimals of the operation token. 
                        This information does not need to be given by the user and is passed to the interface as a query parameter.  
 
-                    7. Interface parameter prompt rules:
+                    8. Interface parameter prompt rules:
                        The user input information needs to be strictly checked. If the interface requires parameters, 
                        the current user does not provide,that is,
                        the parameters of required:true, the user must be prompted to provide the corresponding data, 
                        otherwise the transaction cannot be generated.    
 
-                    8. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.   
-
+                    9. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
                 `,
         tools: [{ type: "generate-transaction" }],
         image: "https://img.ref.finance/images/rhea_logo_svg.svg",
@@ -719,6 +721,141 @@ export async function GET() {
                       error: {
                         type: "string",
                         description: "Error message",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      "/api/tools/swap": {
+        get: {
+          operationId: "get-swap-transactions",
+          description:
+            "Get a transaction payload for swapping between two tokens using the best trading route on Ref.Finance. Token identifiers can be the name, symbol, or contractId and will be fuzzy matched automatically. Default slippage is 2 (2%).",
+          parameters: [
+            {
+              name: "tokenIn",
+              in: "query",
+              description: "The identifier for the input token.",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "tokenOut",
+              in: "query",
+              description: "The identifier for the output token.",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "quantity",
+              in: "query",
+              description: "The amount of tokens to swap (input amount).",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+            {
+              name: "slippage",
+              in: "query",
+              description:
+                "The maximum slippage tolerance in percentage.  Default is 2 (2%).",
+              required: false,
+              schema: {
+                type: "number",
+                format: "float",
+              },
+            },
+          ],
+          responses: {
+            "200": {
+              description: "Successful response",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        signerId: {
+                          type: "string",
+                          description:
+                            "The account ID that will sign the transaction",
+                        },
+                        receiverId: {
+                          type: "string",
+                          description:
+                            "The account ID of the contract that will receive the transaction",
+                        },
+                        actions: {
+                          type: "array",
+                          items: {
+                            type: "object",
+                            properties: {
+                              type: {
+                                type: "string",
+                                description: "The type of action to perform",
+                              },
+                              params: {
+                                type: "object",
+                                properties: {
+                                  methodName: {
+                                    type: "string",
+                                    description:
+                                      "The name of the method to be called",
+                                  },
+                                  args: {
+                                    type: "object",
+                                    description:
+                                      "Arguments for the function call",
+                                  },
+                                  gas: {
+                                    type: "string",
+                                    description:
+                                      "Amount of gas to attach to the transaction",
+                                  },
+                                  deposit: {
+                                    type: "string",
+                                    description:
+                                      "Amount to deposit with the transaction",
+                                  },
+                                },
+                                required: [
+                                  "methodName",
+                                  "args",
+                                  "gas",
+                                  "deposit",
+                                ],
+                              },
+                            },
+                            required: ["type", "params"],
+                          },
+                        },
+                      },
+                      required: ["signerId", "receiverId", "actions"],
+                    },
+                  },
+                },
+              },
+            },
+            "400": {
+              description: "Bad request",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      error: {
+                        type: "string",
+                        description: "The error message",
                       },
                     },
                   },

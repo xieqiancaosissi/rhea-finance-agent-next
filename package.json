@@ -16,6 +16,7 @@
     "@types/bn.js": "^5.1.6",
     "bn.js": "^5.2.2",
     "decimal.js": "^10.5.0",
+    "fuse.js": "^7.1.0",
     "near-api-js": "^5.1.1",
     "near-safe": "^0.9.12",
     "next": "^15.2.4",
@@ -23,6 +24,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "redoc": "^2.4.0",
+    "rhea-dex-swap-sdk": "^0.0.1",
     "vercel-url": "^0.2.6",
     "viem": "^2.23.15"
   },
