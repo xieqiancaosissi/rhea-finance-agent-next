@@ -168,10 +168,12 @@ export async function GET(request: NextRequest) {
     });
     const priceImpactDisplay =
       new Decimal(priceImpact).toFixed(2, Decimal.ROUND_HALF_CEIL) + "%";
+    const displayExpectAmountOut = new Decimal(expectAmountOut).toFixed(Decimal.min(8, tokenOutData.decimals).toNumber(), Decimal.ROUND_HALF_CEIL);
     return NextResponse.json({
       transactions: transformTransactions(refSwapTransactions, accountId),
       priceImpact: priceImpactDisplay,
-      prompt: `Before triggering generate-transaction ask the user to the confirm the effects of the transaction priceImpact`,
+      amountOut: displayExpectAmountOut,
+      prompt: `Before triggering generate-transaction ask the user to the confirm the effects of the transaction, priceImpact and amountOut`,
     });
   } catch (error) {
     console.error("Error swap", error);
