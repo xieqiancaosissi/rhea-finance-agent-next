@@ -50,7 +50,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           error: "No pool available to make a swap",
-          prompt: "It’s possible that the matched token is not the token the user intends to trade. You can ask the user to provide more precise token information, such as the token ID",
+          prompt:
+            "It’s possible that the matched token is not the token the user intends to trade. You can ask the user to provide more precise token information, such as the token ID",
         },
         { status: 200 }
       );
