@@ -785,66 +785,25 @@ export async function GET() {
               content: {
                 "application/json": {
                   schema: {
-                    type: "array",
-                    items: {
-                      type: "object",
-                      properties: {
-                        signerId: {
-                          type: "string",
-                          description:
-                            "The account ID that will sign the transaction",
-                        },
-                        receiverId: {
-                          type: "string",
-                          description:
-                            "The account ID of the contract that will receive the transaction",
-                        },
-                        actions: {
-                          type: "array",
-                          items: {
-                            type: "object",
-                            properties: {
-                              type: {
-                                type: "string",
-                                description: "The type of action to perform",
-                              },
-                              params: {
-                                type: "object",
-                                properties: {
-                                  methodName: {
-                                    type: "string",
-                                    description:
-                                      "The name of the method to be called",
-                                  },
-                                  args: {
-                                    type: "object",
-                                    description:
-                                      "Arguments for the function call",
-                                  },
-                                  gas: {
-                                    type: "string",
-                                    description:
-                                      "Amount of gas to attach to the transaction",
-                                  },
-                                  deposit: {
-                                    type: "string",
-                                    description:
-                                      "Amount to deposit with the transaction",
-                                  },
-                                },
-                                required: [
-                                  "methodName",
-                                  "args",
-                                  "gas",
-                                  "deposit",
-                                ],
-                              },
-                            },
-                            required: ["type", "params"],
-                          },
-                        },
+                    type: "object",
+                    properties: {
+                      transactions: {
+                        type: "array",
+                        description:
+                          "list of near transactions that need to be executed",
                       },
-                      required: ["signerId", "receiverId", "actions"],
+                      priceImpact: {
+                        type: "string",
+                        description: "The price impact of executing this swap",
+                      },
+                      amountOut: {
+                        type: "string",
+                        description:
+                          "The number of outputs obtained from the swap transaction",
+                      },
+                      prompt: {
+                        type: "string",
+                      },
                     },
                   },
                 },
