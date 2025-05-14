@@ -738,7 +738,7 @@ export async function GET() {
         get: {
           operationId: "get-swap-transactions",
           description:
-            "Get a transaction payload for swapping between two tokens using the best trading route on Ref.Finance. Token identifiers can be the name, symbol, or contractId and will be fuzzy matched automatically. Default slippage is 2 (2%).",
+            "Get a transaction payload for swapping between two tokens using the best trading route on Rhea Finance. Token identifiers can be the name, symbol, or contractId and will be fuzzy matched automatically. Default slippage is 2 (2%).",
           parameters: [
             {
               name: "tokenIn",
