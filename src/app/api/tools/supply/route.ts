@@ -3,6 +3,8 @@ import Decimal from "decimal.js";
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/config";
 import { expandTokenDecimal } from "@/utils/common";
 import { WRAP_NEAR_CONTRACT_ID } from "@/utils/constant";
+import { getLendingMatchTokens } from "@/utils/search-token";
+import { LENDING_SUPPORT_TOKENS_TIP } from "@/utils/constant";
 import {
   register,
   validateParams,
@@ -13,22 +15,16 @@ import {
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const token_id = searchParams.get("token_id");
+    let token_id = searchParams.get("token_id");
     const amount = searchParams.get("amount");
     const is_collateral = searchParams.get("is_collateral");
-    const decimals = searchParams.get("decimals");
     const headersList = request.headers;
     const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
     const account_id = mbMetadata?.accountId;
-    console.log("---------token_id", token_id);
+    console.log("---------token_name", token_id);
     console.log("---------amount", amount);
     console.log("---------is_collateral", is_collateral);
-    console.log("---------decimals", decimals);
     console.log("---------account_id", account_id);
-    const amountExpand = expandTokenDecimal(amount || 0, decimals || 0).toFixed(
-      0,
-      Decimal.ROUND_DOWN
-    );
     const errorTip = validateParams([
       {
         value: account_id,
@@ -38,14 +34,27 @@ export async function GET(request: NextRequest) {
         value: token_id,
         errorTip: "token_id parameter is required",
       },
-      {
-        value: decimals,
-        errorTip: "decimals parameter is required",
-      },
     ]);
     if (errorTip) {
       return NextResponse.json({ data: errorTip }, { status: 200 });
     }
+    const token = getLendingMatchTokens(token_id!);
+    if (!token) {
+      return NextResponse.json(
+        {
+          prompt: LENDING_SUPPORT_TOKENS_TIP,
+        },
+        { status: 200 }
+      );
+    }
+    token_id = token.token;
+    const decimals = token.decimals;
+    const amountExpand = expandTokenDecimal(amount || 0, decimals || 0).toFixed(
+      0,
+      Decimal.ROUND_DOWN
+    );
+    console.log("---------decimals, token_id", decimals, token_id);
+
     const max_supply_res = await fetch(
       `${RHEA_LENDING_INTERFACE_DOMAIN}/max_supply_balance/${account_id}/${token_id}`,
       {

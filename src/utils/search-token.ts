@@ -4,6 +4,7 @@ import type { IFuseOptions } from "fuse.js";
 import { allowlistedTokens } from "@/utils/allowlist-tokens";
 import type { AllowlistedToken } from "@/utils/allowlist-tokens";
 import { getListToken } from "./indexer";
+import { support_tokens } from "./tokens";
 
 // Create an array of tokens
 const tokens = Object.values(allowlistedTokens);
@@ -75,4 +76,13 @@ export async function getMatchTokens(
     ) as AllowlistedToken;
   }
   return [tokenInMetadata, tokenOutMetadata];
+}
+
+export function getLendingMatchTokens(tokenName: string) {
+  const matchedToken = support_tokens.find(
+    (token) =>
+      token.symbol.toLocaleLowerCase() == tokenName.toLocaleLowerCase() ||
+      token.token.toLocaleLowerCase() == tokenName.toLocaleLowerCase()
+  );
+  return matchedToken;
 }

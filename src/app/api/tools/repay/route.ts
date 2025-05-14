@@ -9,26 +9,22 @@ import {
   transferToTranstions,
   nearDepositTranstion,
 } from "@/utils/common";
+import { getLendingMatchTokens } from "@/utils/search-token";
+import { LENDING_SUPPORT_TOKENS_TIP } from "@/utils/constant";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const token_id = searchParams.get("token_id");
+    let token_id = searchParams.get("token_id");
     const amount = searchParams.get("amount");
     const from = searchParams.get("from");
-    const decimals = searchParams.get("decimals");
     const headersList = request.headers;
     const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
     const account_id = mbMetadata?.accountId;
     console.log("---------token_id", token_id);
     console.log("---------amount", amount);
     console.log("---------from", from);
-    console.log("---------decimals", decimals);
     console.log("---------account_id", account_id);
-    const amountExpand = expandTokenDecimal(amount || 0, decimals || 0).toFixed(
-      0,
-      Decimal.ROUND_DOWN
-    );
     const errorTip = validateParams([
       {
         value: account_id,
@@ -38,14 +34,26 @@ export async function GET(request: NextRequest) {
         value: token_id,
         errorTip: "token_id parameter is required",
       },
-      {
-        value: decimals,
-        errorTip: "decimals parameter is required",
-      },
     ]);
     if (errorTip) {
       return NextResponse.json({ data: errorTip }, { status: 200 });
     }
+    const token = getLendingMatchTokens(token_id!);
+    if (!token) {
+      return NextResponse.json(
+        {
+          prompt: LENDING_SUPPORT_TOKENS_TIP,
+        },
+        { status: 200 }
+      );
+    }
+    token_id = token.token;
+    const decimals = token.decimals;
+    const amountExpand = expandTokenDecimal(amount || 0, decimals || 0).toFixed(
+      0,
+      Decimal.ROUND_DOWN
+    );
+    console.log("---------decimals, token_id", decimals, token_id);
     const transactions = [];
     const register_result = await register(account_id as string);
     if (register_result) {

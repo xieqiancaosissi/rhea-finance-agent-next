@@ -28,123 +28,29 @@ export async function GET() {
                       /api/tools/adjust: Adjust token collateral.
                       /api/tools/repay: repay token borrowed.
                       /api/tools/withdraw: withdraw token.
-                      /api/tools/swap: swaps token。
+                      /api/tools/swap: swaps token.
 
-                    2. If the user performs supply, borrow, adjust, repay, or withdraw operation, only the following tokens are supported.
-                        [
-                            {
-                                "symbol": "BRRR",
-                                "token": "token.burrow.near",
-                                "decimals": 18,
-                            },
-                            {
-                                "symbol": "DAI",
-                                "token": "6b175474e89094c44da98b954eedeac495271d0f.factory.bridge.near",
-                                "decimals": 18,
-                            },
-                            {
-                                "symbol": "USDT.e",
-                                "token": "dac17f958d2ee523a2206206994597c13d831ec7.factory.bridge.near",
-                                "decimals": 6,
-                            },
-                            {
-                                "symbol": "USDC.e",
-                                "token": "a0b86991c6218b36c1d19d4a2e9eb0ce3606eb48.factory.bridge.near",
-                                "decimals": 6,
-                            },
-                            {
-                                "symbol": "wNEAR",
-                                "token": "wrap.near",
-                                "decimals": 24,
-                            },
-                            {
-                                "symbol": "NEAR",
-                                "token": "wrap.near",
-                                "decimals": 24,
-                            },
-                            {
-                                "symbol": "STNEAR",
-                                "token": "meta-pool.near",
-                                "decimals": 24,
-                            },
-                            {
-                                "symbol": "WBTC",
-                                "token": "2260fac5e5542a773aa44fbcfedf7c193bc2c599.factory.bridge.near",
-                                "decimals": 8,
-                            },
-                            {
-                                "symbol": "AURORA",
-                                "token": "aaaaaa20d9e0e2461697782ef11675f668207961.factory.bridge.near",
-                                "decimals": 18,
-                            },
-                            {
-                                "symbol": "LINEAR",
-                                "token": "linear-protocol.near",
-                                "decimals": 24,
-                            },
-                            {
-                                "symbol": "USDt",
-                                "token": "usdt.tether-token.near",
-                                "decimals": 6,
-                            },
-                            {
-                                "symbol": "USDC",
-                                "token": "17208628f84f5d6ad33f0da3bbbeb27ffcb398eac501a31bd6ad2011e36133a1",
-                                "decimals": 6,
-                            },
-                            {
-                                "symbol": "FRAX",
-                                "token": "853d955acef822db058eb8505911ed77f175b99e.factory.bridge.near",
-                                "decimals": 18,
-                            },
-                            {
-                                "symbol": "NBTC",
-                                "token": "nbtc.bridge.near",
-                                "decimals": 8,
-                            },
-                            {
-                                "symbol": "ZEC",
-                                "token": "zec.omft.near",
-                                "decimals": 8,
-                            },
-                            {
-                                "symbol": "ETH",
-                                "token": "eth.bridge.near",
-                                "decimals": 18,
-                            }
-                       ]
-                       a: This token list provide the token symbol, token id, and token decimals.
-                          The token id and decimals required by the interface can be obtained from here.
-
-                       b: If the user performs supply, borrow, adjust, repay, or withdraw operation,
-                          and the token entered by the user is not supported, 
-                          the user will be prompted that the token is not within the range supported by your operation,
-                          And show the supported tokens to the user
-
-                    3. If the user performs a swap operation:
+                    2. When a user executes a transaction:
                        Get information for a given fungible token or swaps one token for another. 
                        Do not modify token identifiers, they will be fuzzy matched automatically.
 
-                   4.If the user supplies a token and does not specify whether collateral is required, 
-                      the user is prompted to select whether collateral is required.
-                      except BRRR, and BRRR can only be false.
+                    3. If the user supplies a token and does not specify whether collateral is required, 
+                       the user is prompted to select whether collateral is required.
+                       except BRRR, and BRRR can only be false.
 
-                    5. If the user want to repay and the user does not specify the repay type, tell the user which repay method to choose. 
+                    4. If the user want to repay and the user does not specify the repay type, tell the user which repay method to choose. 
                        There are two options: wallet and supplied.
 
-                   6. If the user wants to adjust the collateral of the token and no adjustment way is specified, tell the user
+                    5. If the user wants to adjust the collateral of the token and no adjustment way is specified, tell the user
                        There are two options: increase and decrease. 
                    
-                   7. Please help me query the decimals of the operation token. 
-                       This information does not need to be given by the user and is passed to the interface as a query parameter.  
-
-                   8. Interface parameter prompt rules:
+                    6. Interface parameter prompt rules:
                        The user input information needs to be strictly checked. If the interface requires parameters, 
                        the current user does not provide,that is,
                        the parameters of required:true, the user must be prompted to provide the corresponding data, 
                        otherwise the transaction cannot be generated.    
 
-                   9. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
+                    7 If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
                 `,
         tools: [{ type: "generate-transaction" }],
         image: "https://img.ref.finance/images/rhea_logo_svg.svg",
@@ -184,15 +90,6 @@ export async function GET() {
               },
               description:
                 "Is it necessary to use the supplied token as collateral",
-            },
-            {
-              name: "decimals",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The decimals of token",
             },
           ],
           responses: {
@@ -292,15 +189,6 @@ export async function GET() {
               },
               description: "The amount of borrow token",
             },
-            {
-              name: "decimals",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The decimals of token",
-            },
           ],
           responses: {
             "200": {
@@ -396,15 +284,6 @@ export async function GET() {
                 type: "string",
               },
               description: "The amount of withdraw token",
-            },
-            {
-              name: "decimals",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The decimals of token",
             },
           ],
           responses: {
@@ -530,15 +409,6 @@ export async function GET() {
               description: "The amount of repay token",
             },
             {
-              name: "decimals",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The decimals of token",
-            },
-            {
               name: "from",
               in: "query",
               required: true,
@@ -651,15 +521,6 @@ export async function GET() {
                 type: "string",
               },
               description: "The amount of repay token",
-            },
-            {
-              name: "decimals",
-              in: "query",
-              required: true,
-              schema: {
-                type: "string",
-              },
-              description: "The decimals of token",
             },
             {
               name: "type",
