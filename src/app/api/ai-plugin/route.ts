@@ -29,18 +29,8 @@ export async function GET() {
                       /api/tools/repay: repay token borrowed.
                       /api/tools/withdraw: withdraw token.
                       /api/tools/swap: swaps token。
-                   
-                    2.If the user supplies a token and does not specify whether collateral is required, 
-                      the user is prompted to select whether collateral is required.
-                      except BRRR, and BRRR can only be false.
 
-                    3. If the user want to repay and the user does not specify the repay type, tell the user which repay method to choose. 
-                       There are two options: wallet and supplied.
-
-                    4. If the user wants to adjust the collateral of the token and no adjustment way is specified, tell the user
-                       There are two options: increase and decrease. 
-                       
-                    5. If the user performs a supply, borrow, adjust, repay, or withdraw operation, only the following tokens are supported. If the user performs a swap operation, this instruction can be ignored.
+                    2. If the user performs supply, borrow, adjust, repay, or withdraw operation, only the following tokens are supported.
                         [
                             {
                                 "symbol": "BRRR",
@@ -123,24 +113,38 @@ export async function GET() {
                                 "decimals": 18,
                             }
                        ]
-                       (1) This list provides the token symbol, token id, and token decimals.
-                           The token_id and decimals information required by the interface can be obtained from here.
-                       (2) If the token entered by the user is not supported, 
-                           the user will be prompted that the token is not within the range supported by your operation,
-                           And show the supported tokens to the user
+                       a: This token list provide the token symbol, token id, and token decimals.
+                          The token id and decimals required by the interface can be obtained from here.
 
-                    6. If the user is performing a swap operation:
-                       Get information for a given fungible token or swaps one token for another. Do not modify token identifiers, they will be fuzzy matched automatically.
-                    7. Please help me query the decimals of the operation token. 
+                       b: If the user performs supply, borrow, adjust, repay, or withdraw operation,
+                          and the token entered by the user is not supported, 
+                          the user will be prompted that the token is not within the range supported by your operation,
+                          And show the supported tokens to the user
+
+                    3. If the user performs a swap operation:
+                       Get information for a given fungible token or swaps one token for another. 
+                       Do not modify token identifiers, they will be fuzzy matched automatically.
+
+                   4.If the user supplies a token and does not specify whether collateral is required, 
+                      the user is prompted to select whether collateral is required.
+                      except BRRR, and BRRR can only be false.
+
+                    5. If the user want to repay and the user does not specify the repay type, tell the user which repay method to choose. 
+                       There are two options: wallet and supplied.
+
+                   6. If the user wants to adjust the collateral of the token and no adjustment way is specified, tell the user
+                       There are two options: increase and decrease. 
+                   
+                   7. Please help me query the decimals of the operation token. 
                        This information does not need to be given by the user and is passed to the interface as a query parameter.  
 
-                    8. Interface parameter prompt rules:
+                   8. Interface parameter prompt rules:
                        The user input information needs to be strictly checked. If the interface requires parameters, 
                        the current user does not provide,that is,
                        the parameters of required:true, the user must be prompted to provide the corresponding data, 
                        otherwise the transaction cannot be generated.    
 
-                    9. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
+                   9. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
                 `,
         tools: [{ type: "generate-transaction" }],
         image: "https://img.ref.finance/images/rhea_logo_svg.svg",

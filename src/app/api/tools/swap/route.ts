@@ -1,24 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
 import Decimal from "decimal.js";
-import {
-  WRAP_NEAR_CONTRACT_ID,
-  estimateSwap,
-  fetchAllPools,
-  ftGetTokenMetadata,
-  getStablePools,
-  instantSwap,
-  nearDepositTransaction,
-  nearWithdrawTransaction,
-  transformTransactions,
-  getPriceImpact,
-  getExpectedOutputFromSwapTodos,
-} from "rhea-dex-swap-sdk";
-import type { EstimateSwapView, Pool } from "rhea-dex-swap-sdk";
-
-import { searchToken } from "@/utils/search-token";
+import { getMatchTokens } from "@/utils/search-token";
 import { getSlippageTolerance } from "@/utils/slippage";
-
-const REFERRAL_ID = "bitte.near";
+import { fetchAllPools, getTokenPriceList, findPath } from "@/utils/indexer";
+import { toNonDivisibleNumber, toReadableNumber } from "@/utils/tools";
+import { nearDepositTranstion, registerOnToken } from "@/utils/common";
+import { WRAP_NEAR_CONTRACT_ID, REF_FI_CONTRACT_ID } from "@/utils/constant";
 
 export async function GET(request: NextRequest) {
   try {
@@ -27,156 +14,153 @@ export async function GET(request: NextRequest) {
     const tokenOut = searchParams.get("tokenOut");
     const quantity = searchParams.get("quantity");
     const slippage = searchParams.get("slippage");
+    const headersList = request.headers;
+    const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
+    const accountId = mbMetadata?.accountId;
     console.log("---------tokenIn", tokenIn);
     console.log("---------tokenOut", tokenOut);
     console.log("---------quantity", quantity);
     console.log("---------slippage", slippage);
-    const headersList = request.headers;
-    const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
-    const accountId = mbMetadata?.accountId;
+    console.log("---------accountId", accountId);
 
-    const { ratedPools, unRatedPools, simplePools } = await fetchAllPools();
-    const stablePools: Pool[] = unRatedPools.concat(ratedPools);
-
-    // remove low liquidity DEGEN_SWAP pools
-    const nonDegenStablePools = stablePools.filter(
-      (pool) => pool.pool_kind !== "DEGEN_SWAP"
+    const [tokenInData, tokenOutData] = await getMatchTokens(
+      tokenIn!,
+      tokenOut!
     );
 
-    const nonDegenStablePoolsDetails = await getStablePools(
-      nonDegenStablePools
-    );
-
-    const isNearIn = tokenIn!.toLowerCase() === "near";
-    const isNearOut = tokenOut!.toLowerCase() === "near";
-
-    const tokenInMatch = searchToken(tokenIn!)[0];
-    const tokenOutMatch = searchToken(tokenOut!)[0];
-    console.log("--------------------tokenInMatch", tokenInMatch.id);
-    console.log("--------------------tokenOutMatch", tokenOutMatch.id);
-    if (!tokenInMatch || !tokenOutMatch) {
+    if (!tokenInData || !tokenOutData) {
       return NextResponse.json(
         {
-          error: `Unable to find token(s) tokenInMatch: ${tokenInMatch?.name} tokenOutMatch: ${tokenOutMatch?.name}`,
-        },
-        { status: 500 }
-      );
-    }
-
-    const [tokenInData, tokenOutData] = await Promise.all([
-      ftGetTokenMetadata(tokenInMatch.id),
-      ftGetTokenMetadata(tokenOutMatch.id),
-    ]);
-
-    if (tokenInData.id === WRAP_NEAR_CONTRACT_ID && isNearOut) {
-      return NextResponse.json(
-        {
-          transactions: transformTransactions(
-            [nearWithdrawTransaction(quantity!)],
-            accountId
-          ),
+          error: `Unable to find token(s) tokenInMatch: ${tokenIn} tokenOutMatch: ${tokenOut}`,
         },
         { status: 200 }
       );
     }
-
-    if (isNearIn && tokenOutData.id === WRAP_NEAR_CONTRACT_ID) {
+    const amountIn = toNonDivisibleNumber(tokenInData.decimals, quantity!);
+    const _slippage = getSlippageTolerance(slippage);
+    const resultFromServer = await findPath({
+      amountIn,
+      tokenInId: tokenInData.id,
+      tokenOutId: tokenOutData.id,
+      slippage: _slippage,
+    });
+    const result_data = resultFromServer.result_data;
+    const { amount_out, routes } = result_data;
+    if (routes?.length == 0) {
       return NextResponse.json(
         {
-          transactions: transformTransactions(
-            [nearDepositTransaction(quantity!)],
-            accountId
-          ),
+          error: "No pool available to make a swap",
         },
         { status: 200 }
       );
     }
-
-    if (tokenInData.id === tokenOutData.id && isNearIn === isNearOut) {
-      return NextResponse.json(
-        {
-          error: "TokenIn and TokenOut cannot be the same",
-        },
-        { status: 500 }
-      );
-    }
-
-    const refEstimateSwap = (enableSmartRouting: boolean) => {
-      return estimateSwap({
-        tokenIn: tokenInData,
-        tokenOut: tokenOutData,
-        amountIn: quantity!,
-        simplePools,
-        options: {
-          enableSmartRouting,
-          stablePools: nonDegenStablePools,
-          stablePoolsDetail: nonDegenStablePoolsDetails,
-        },
+    const actionsList: any[] = [];
+    routes.forEach((route: any) => {
+      route.pools.forEach((pool: any) => {
+        if (+(pool?.amount_in || 0) == 0) {
+          delete pool.amount_in;
+        }
+        pool.pool_id = Number(pool.pool_id);
+        actionsList.push(pool);
       });
-    };
+    });
+    const transactions = [];
+    // near deposit
+    if (tokenInData.id == WRAP_NEAR_CONTRACT_ID) {
+      const _nearDeposit = nearDepositTranstion(accountId, quantity!);
+      transactions.push(_nearDeposit);
+    }
+    // tokenOut register
+    const _register = await registerOnToken(accountId, tokenOutData.id);
+    if (_register) {
+      transactions.push(_register);
+    }
+    // ---------------------transactions
+    // swap
+    transactions.push({
+      signerId: accountId,
+      receiverId: tokenInData.id,
+      actions: [
+        {
+          type: "FunctionCall",
+          params: {
+            methodName: "ft_transfer_call",
+            args: {
+              receiver_id: REF_FI_CONTRACT_ID,
+              amount: amountIn,
+              msg: JSON.stringify({
+                force: 0,
+                actions: actionsList,
+                ...(tokenOutData.id == WRAP_NEAR_CONTRACT_ID
+                  ? { skip_unwrap_near: false }
+                  : {}),
+              }),
+            },
+            gas: "300000000000000",
+            deposit: "1",
+          },
+        },
+      ],
+    });
 
-    const swapTodos: EstimateSwapView[] = await refEstimateSwap(true).catch(
-      () => {
-        return refEstimateSwap(false); // fallback to non-smart routing if unsupported
-      }
+    // -------------------------------baseData
+    const { ratedPools, unRatedPools, simplePools } = await fetchAllPools();
+    const tokenPriceList = await getTokenPriceList();
+    const allPools = unRatedPools.concat(ratedPools).concat(simplePools);
+    // -------------------------------avgFee
+    let avgFee: number = 0;
+    routes.forEach((route: any) => {
+      const { amount_in, pools } = route;
+      const poolDetails = pools.map((p: any) => {
+        return allPools.find((pool: any) => +pool.id == +p.pool_id);
+      });
+      const poolsMap = poolDetails.reduce((acc: any, cur: any) => {
+        acc[cur.id] = cur;
+        return acc;
+      }, {});
+      const allocation = new Decimal(amount_in).div(amountIn);
+      const routeFee = pools.reduce((acc: any, cur: any) => {
+        return acc.plus(
+          poolsMap[cur.pool_id]?.fee || poolsMap[cur.pool_id]?.total_fee || 0
+        );
+      }, new Decimal(0));
+      avgFee += allocation.mul(routeFee).toNumber();
+    });
+    // ----------------------priceImpact
+    const tokenOutAmount = toReadableNumber(tokenOutData.decimals, amount_out);
+    const newPrice = new Decimal(quantity || "0").div(
+      new Decimal(tokenOutAmount || "1")
     );
-
-    const slippageTolerance = getSlippageTolerance(slippage!);
-
-    const refSwapTransactions = await instantSwap({
-      tokenIn: tokenInData,
-      tokenOut: tokenOutData,
-      amountIn: quantity!,
-      swapTodos,
-      slippageTolerance,
-      AccountId: accountId,
-      referralId: REFERRAL_ID,
-    });
-
-    if (isNearIn) {
-      // wrap near
-      refSwapTransactions.unshift(nearDepositTransaction(quantity!));
+    const priceIn = tokenPriceList[tokenInData.id]?.price;
+    const priceOut = tokenPriceList[tokenOutData.id]?.price;
+    const oldPrice = new Decimal(priceOut).div(new Decimal(priceIn));
+    const priceImpactPending = newPrice.lt(oldPrice)
+      ? "0"
+      : newPrice.minus(oldPrice).div(newPrice).times(100).abs().toFixed();
+    const priceImpact = new Decimal(priceImpactPending).minus(
+      new Decimal((avgFee || 0) / 100)
+    );
+    let priceImpactDisplay = "";
+    if (priceImpact.lt(0.01)) {
+      priceImpactDisplay = "< -0.01%";
+    } else if (priceImpact.gt(1000)) {
+      priceImpactDisplay = "< -1000%";
+    } else {
+      priceImpactDisplay = `-${priceImpact.toFixed(2)}%`;
     }
-
-    if (isNearOut) {
-      const lastFunctionCall = refSwapTransactions.at(-1)?.functionCalls.at(-1);
-
-      const args = lastFunctionCall?.args;
-
-      if (args && "msg" in args && typeof args.msg === "string") {
-        const argsMsgObj = JSON.parse(args.msg);
-
-        argsMsgObj.skip_unwrap_near = false;
-
-        lastFunctionCall.args = {
-          ...lastFunctionCall.args,
-          msg: JSON.stringify(argsMsgObj),
-        };
-      }
-    }
-    const expectAmountOut = getExpectedOutputFromSwapTodos(
-      swapTodos,
-      tokenOutData.id
-    ).toString();
-    const priceImpact = getPriceImpact({
-      estimates: swapTodos,
-      tokenIn: tokenInData,
-      tokenOut: tokenOutData,
-      amountIn: quantity!,
-      amountOut: expectAmountOut,
-      stablePools: nonDegenStablePoolsDetails,
-    });
-    const priceImpactDisplay =
-      new Decimal(priceImpact).toFixed(2, Decimal.ROUND_HALF_CEIL) + "%";
-    const displayExpectAmountOut = new Decimal(expectAmountOut).toFixed(Decimal.min(8, tokenOutData.decimals).toNumber(), Decimal.ROUND_HALF_CEIL);
+    const displayExpectAmountOut = new Decimal(tokenOutAmount).toFixed(
+      Decimal.min(8, tokenOutData.decimals).toNumber(),
+      Decimal.ROUND_HALF_CEIL
+    );
+    // ------------------------------response
     return NextResponse.json({
-      transactions: transformTransactions(refSwapTransactions, accountId),
+      transactions,
       priceImpact: priceImpactDisplay,
       amountOut: displayExpectAmountOut,
-      prompt: `Before triggering generate-transaction ask the user to the confirm the effects of the transaction, priceImpact and amountOut`,
+      prompt: `Before triggering generate-transaction ask the user to confirm the effects of the transaction: priceImpact and amountOut`,
     });
   } catch (error) {
     console.error("Error swap", error);
-    return NextResponse.json({ error: "Failed to swap" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to swap" }, { status: 200 });
   }
 }

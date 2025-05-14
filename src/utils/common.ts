@@ -1,6 +1,7 @@
 import { utils } from "near-api-js";
 import Decimal from "decimal.js";
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/config";
+import { WRAP_NEAR_CONTRACT_ID, BURROW_MAIN_CONTRACT_ID } from "./constant";
 interface IResult {
   code: string;
   data: {
@@ -10,8 +11,6 @@ interface IResult {
   };
   msg: string;
 }
-const burrow_main_contract_id = "contract.main.burrow.near";
-export const wnear_contract_id = "wrap.near";
 export async function register(account_id: string) {
   const query = await fetch(
     `${RHEA_LENDING_INTERFACE_DOMAIN}/storage_balance_of`,
@@ -21,7 +20,7 @@ export async function register(account_id: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        token_id: burrow_main_contract_id,
+        token_id: BURROW_MAIN_CONTRACT_ID,
         account_id,
       }),
     }
@@ -30,7 +29,7 @@ export async function register(account_id: string) {
   if (!query_reault.data) {
     const transaction = {
       signerId: account_id,
-      receiverId: burrow_main_contract_id,
+      receiverId: BURROW_MAIN_CONTRACT_ID,
       actions: [
         {
           type: "FunctionCall",
@@ -85,7 +84,7 @@ export function transferToTranstions(result: IResult, account_id: string) {
 export function nearDepositTranstion(account_id: string, amount: string) {
   const transaction = {
     signerId: account_id,
-    receiverId: wnear_contract_id,
+    receiverId: WRAP_NEAR_CONTRACT_ID,
     actions: [
       {
         type: "FunctionCall",
@@ -104,7 +103,7 @@ export function nearDepositTranstion(account_id: string, amount: string) {
 export function nearWithdrawTranstion(account_id: string, amount: string) {
   const transaction = {
     signerId: account_id,
-    receiverId: wnear_contract_id,
+    receiverId: WRAP_NEAR_CONTRACT_ID,
     actions: [
       {
         type: "FunctionCall",
@@ -123,4 +122,42 @@ export function nearWithdrawTranstion(account_id: string, amount: string) {
     ],
   };
   return transaction;
+}
+export async function registerOnToken(account_id: string, token_id: string) {
+  const query = await fetch(
+    `${RHEA_LENDING_INTERFACE_DOMAIN}/storage_balance_of`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token_id,
+        account_id,
+      }),
+    }
+  );
+  const query_reault = await query.json();
+  if (!query_reault.data) {
+    const transaction = {
+      signerId: account_id,
+      receiverId: token_id,
+      actions: [
+        {
+          type: "FunctionCall",
+          params: {
+            methodName: "storage_deposit",
+            args: {
+              account_id,
+              registration_only: true,
+            },
+            gas: "100000000000000",
+            deposit: utils.format.parseNearAmount("0.1"),
+          },
+        },
+      ],
+    };
+    return transaction;
+  }
+  return null;
 }

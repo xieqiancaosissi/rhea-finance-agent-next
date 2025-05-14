@@ -2,11 +2,11 @@ import { NextResponse, NextRequest } from "next/server";
 import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/config";
 import Decimal from "decimal.js";
 import { expandTokenDecimal } from "@/utils/common";
+import { WRAP_NEAR_CONTRACT_ID } from "@/utils/constant";
 import {
   register,
   validateParams,
   transferToTranstions,
-  wnear_contract_id,
   nearDepositTranstion,
 } from "@/utils/common";
 
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
             { status: 200 }
           );
         }
-        if (token_id == wnear_contract_id) {
+        if (token_id == WRAP_NEAR_CONTRACT_ID) {
           const near_deposit_tx = nearDepositTranstion(account_id, amount!);
           transactions.push(near_deposit_tx);
         }

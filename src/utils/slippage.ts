@@ -1,6 +1,6 @@
-const DEFAULT_SLIPPAGE_TOLERANCE = 2; // 2%
+const DEFAULT_SLIPPAGE_TOLERANCE = 0.005;
 
-export const getSlippageTolerance = (slippage?: string): number => {
+export const getSlippageTolerance = (slippage?: string | null): number => {
   const tolerance = slippage ? Number.parseFloat(slippage) : null;
   if (
     tolerance === null ||
@@ -10,5 +10,5 @@ export const getSlippageTolerance = (slippage?: string): number => {
   ) {
     return DEFAULT_SLIPPAGE_TOLERANCE;
   }
-  return tolerance;
+  return Number(slippage) / 100;
 };
