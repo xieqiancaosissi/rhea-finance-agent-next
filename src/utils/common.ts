@@ -72,7 +72,7 @@ export function transferToTranstions(result: IResult, account_id: string) {
         params: {
           methodName: result.data.method_name,
           args: result.data.args || {},
-          gas: "100000000000000",
+          gas: "300000000000000",
           deposit: "1",
         },
       },
