@@ -7,6 +7,7 @@ import { getLendingMatchTokens } from "@/utils/search-token";
 import { LENDING_SUPPORT_TOKENS_TIP } from "@/utils/constant";
 import {
   register,
+  registerOnToken,
   validateParams,
   transferToTranstions,
   nearDepositTranstion,
@@ -80,6 +81,18 @@ export async function GET(request: NextRequest) {
       transactions.push(register_tx);
     }
     if (token_id == WRAP_NEAR_CONTRACT_ID) {
+      const register_token_result = await registerOnToken(
+        account_id,
+        token_id,
+        "0.00125"
+      );
+      console.log(
+        "------------------register_token_result",
+        register_token_result
+      );
+      if (register_token_result) {
+        transactions.push(register_token_result);
+      }
       const near_deposit_tx = nearDepositTranstion(account_id, amount!);
       transactions.push(near_deposit_tx);
     }

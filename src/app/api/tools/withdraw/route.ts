@@ -8,6 +8,7 @@ import {
   validateParams,
   transferToTranstions,
   nearWithdrawTranstion,
+  registerOnToken,
 } from "@/utils/common";
 import { getLendingMatchTokens } from "@/utils/search-token";
 import { LENDING_SUPPORT_TOKENS_TIP } from "@/utils/constant";
@@ -70,10 +71,19 @@ export async function GET(request: NextRequest) {
     }
     const transactions = [];
     const register_result = await register(account_id as string);
+    // register on contract
     if (register_result) {
       transactions.push(register_result);
       return NextResponse.json(transactions);
     } else {
+      const register_token_result = await registerOnToken(
+        account_id,
+        token_id,
+        "0.00125"
+      );
+      if (register_token_result) {
+        transactions.push(register_token_result);
+      }
       const res = await fetch(`${RHEA_LENDING_INTERFACE_DOMAIN}/withdraw`, {
         method: "POST",
         headers: {

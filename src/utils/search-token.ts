@@ -37,7 +37,8 @@ export const searchTokenByName = (
   query: string,
   list: Record<string, AllowlistedToken>
 ): AllowlistedToken[] => {
-  if (query.toLowerCase() === "near") return [list["wrap.near"]];
+  if (query.toLowerCase() === "near" || query.toLowerCase() === "wnear")
+    return [list["wrap.near"]];
   // Search the tokens with the query
   const result = fuse.search(query);
 
@@ -79,6 +80,15 @@ export async function getMatchTokens(
 }
 
 export function getLendingMatchTokens(tokenName: string) {
+  if (
+    tokenName.toLowerCase() === "near" ||
+    tokenName.toLocaleLowerCase() === "wnear"
+  )
+    return {
+      symbol: "wNEAR",
+      token: "wrap.near",
+      decimals: 24,
+    };
   const matchedToken = support_tokens.find(
     (token) =>
       token.symbol.toLocaleLowerCase() == tokenName.toLocaleLowerCase() ||

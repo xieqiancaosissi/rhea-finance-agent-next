@@ -123,7 +123,11 @@ export function nearWithdrawTranstion(account_id: string, amount: string) {
   };
   return transaction;
 }
-export async function registerOnToken(account_id: string, token_id: string) {
+export async function registerOnToken(
+  account_id: string,
+  token_id: string,
+  amount?: string
+) {
   const query = await fetch(
     `${RHEA_LENDING_INTERFACE_DOMAIN}/storage_balance_of`,
     {
@@ -152,7 +156,7 @@ export async function registerOnToken(account_id: string, token_id: string) {
               registration_only: true,
             },
             gas: "100000000000000",
-            deposit: utils.format.parseNearAmount("0.1"),
+            deposit: utils.format.parseNearAmount(amount || "0.1"),
           },
         },
       ],

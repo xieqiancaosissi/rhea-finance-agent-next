@@ -5,6 +5,7 @@ import { expandTokenDecimal } from "@/utils/common";
 import { WRAP_NEAR_CONTRACT_ID } from "@/utils/constant";
 import {
   register,
+  registerOnToken,
   validateParams,
   transferToTranstions,
   nearWithdrawTranstion,
@@ -75,6 +76,14 @@ export async function GET(request: NextRequest) {
       transactions.push(register_result);
       return NextResponse.json(transactions);
     } else {
+      const register_token_result = await registerOnToken(
+        account_id,
+        token_id,
+        "0.00125"
+      );
+      if (register_token_result) {
+        transactions.push(register_token_result);
+      }
       const res = await fetch(`${RHEA_LENDING_INTERFACE_DOMAIN}/burrow`, {
         method: "POST",
         headers: {
