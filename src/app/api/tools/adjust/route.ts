@@ -3,8 +3,9 @@ import { RHEA_LENDING_INTERFACE_DOMAIN } from "@/config";
 import Decimal from "decimal.js";
 import { expandTokenDecimal } from "@/utils/common";
 import { register, validateParams, transferToTranstions } from "@/utils/common";
-import { getLendingMatchTokens } from "@/utils/search-token";
+import { getLendingMatchToken } from "@/utils/search-token";
 import { LENDING_SUPPORT_TOKENS_TIP } from "@/utils/constant";
+import { get_decrease_collateral_health_factor } from "@/utils/lending";
 
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
     if (errorTip) {
       return NextResponse.json({ data: errorTip }, { status: 200 });
     }
-    const token = getLendingMatchTokens(token_id!);
+    const token = getLendingMatchToken(token_id!);
     if (!token) {
       return NextResponse.json(
         {
@@ -68,8 +69,6 @@ export async function GET(request: NextRequest) {
       const un_collateral_data = new Decimal(data || 0).minus(
         collateral_data || 0
       );
-      // console.log('-------------collateral_data', collateral_data);
-      // console.log('-------------un_collateral_data', un_collateral_data.toFixed());
       if (type == "increase") {
         if (new Decimal(un_collateral_data).lt(amount || 0)) {
           return NextResponse.json(
@@ -110,6 +109,22 @@ export async function GET(request: NextRequest) {
             { status: 200 }
           );
         }
+        const health_factor_after_decrease =
+          await get_decrease_collateral_health_factor({
+            token_id,
+            amount: amountExpand,
+            account_id,
+          });
+        if (new Decimal(health_factor_after_decrease || 0).lt(100)) {
+          return NextResponse.json(
+            {
+              prompt:
+                "Your health factor will be dangerously low and you're at risk of liquidation",
+            },
+            { status: 200 }
+          );
+        }
+        // Your health factor will be dangerously low and you're at risk of liquidation
         const res = await fetch(
           `${RHEA_LENDING_INTERFACE_DOMAIN}/decrease_collateral`,
           {

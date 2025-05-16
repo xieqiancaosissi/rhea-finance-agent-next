@@ -79,7 +79,7 @@ export async function getMatchTokens(
   return [tokenInMetadata, tokenOutMetadata];
 }
 
-export function getLendingMatchTokens(tokenName: string) {
+export function getLendingMatchToken(tokenName: string) {
   if (
     tokenName.toLowerCase() === "near" ||
     tokenName.toLocaleLowerCase() === "wnear"
@@ -95,4 +95,33 @@ export function getLendingMatchTokens(tokenName: string) {
       token.token.toLocaleLowerCase() == tokenName.toLocaleLowerCase()
   );
   return matchedToken;
+}
+export async function getDexMatchToken(tokenName: string) {
+  if (
+    tokenName.toLowerCase() === "near" ||
+    tokenName.toLocaleLowerCase() === "wnear"
+  )
+    return {
+      symbol: "NEAR",
+      id: "NEAR",
+      decimals: 24,
+    };
+  const tokens = await getListToken();
+  const tokenMap = Object.keys(tokens).reduce((acc: any, token_id) => {
+    const token = tokens[token_id];
+    token.id = token_id;
+    acc[token_id] = token;
+    return acc;
+  }, {});
+  const tokenList: AllowlistedToken[] = Object.values(tokenMap);
+  let tokenMetadata: AllowlistedToken;
+  tokenMetadata = searchTokenByName(tokenName, tokenMap)?.[0];
+  if (!tokenMetadata) {
+    tokenMetadata = tokenList.find(
+      (token: any) =>
+        token.id?.toLowerCase() == tokenName.toLowerCase() ||
+        token.symbol?.toLowerCase() == tokenName.toLowerCase()
+    ) as AllowlistedToken;
+  }
+  return tokenMetadata;
 }

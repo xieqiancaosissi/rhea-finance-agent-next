@@ -30,6 +30,11 @@ export async function GET() {
                       /api/tools/withdraw: withdraw token.
                       /api/tools/swap: swaps token.
 
+                      query api:
+                      /api/query/balance: get token balance.
+                      /api/query/dashboard: get user account details or dashboard on lending.
+                      /api/query/healthFactor: get user health factor.
+
                     2. When a user executes a transaction:
                        Get information for a given fungible token or swaps one token for another. 
                        Do not modify token identifiers, they will be fuzzy matched automatically.
@@ -50,7 +55,10 @@ export async function GET() {
                        the parameters of required:true, the user must be prompted to provide the corresponding data, 
                        otherwise the transaction cannot be generated.    
 
-                    7 If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
+                    7. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
+
+                    8. If the user query the balance of near or NEAR token, call the /api/query/balance api route.
+
                 `,
         tools: [{ type: "generate-transaction" }],
         image: "https://img.ref.finance/images/rhea_logo_svg.svg",
@@ -680,6 +688,118 @@ export async function GET() {
                       error: {
                         type: "string",
                         description: "The error message",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      "/api/query/balance": {
+        get: {
+          operationId: "get-token-balance",
+          description:
+            "Get token balance. Token identifiers can be the name, symbol, or contractId and will be fuzzy matched automatically.",
+          parameters: [
+            {
+              name: "token",
+              in: "query",
+              description: "The identifier for the token to get balance for.",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
+          responses: {
+            "200": {
+              description: "Successful response",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+            "400": {
+              description: "Bad request",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      error: {
+                        type: "string",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      "/api/query/healthFactor": {
+        get: {
+          operationId: "get-user-health-factor",
+          description: "Get the user's health factor on the lending finance",
+          responses: {
+            "200": {
+              description: "Successful response",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "string",
+                  },
+                },
+              },
+            },
+            "400": {
+              description: "Bad request",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      error: {
+                        type: "string",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      "/api/query/dashboard": {
+        get: {
+          operationId: "get-user-dashboard",
+          description:
+            "Get the user account details or dashboard on the lending finance",
+          responses: {
+            "200": {
+              description: "Successful response",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                  },
+                },
+              },
+            },
+            "400": {
+              description: "Bad request",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      error: {
+                        type: "string",
                       },
                     },
                   },
