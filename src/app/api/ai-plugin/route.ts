@@ -29,8 +29,6 @@ export async function GET() {
                       /api/tools/repay: repay token borrowed.
                       /api/tools/withdraw: withdraw token.
                       /api/tools/swap: swaps token.
-
-                      query api:
                       /api/query/balance: get token balance.
                       /api/query/dashboard: get user account details or dashboard on lending.
                       /api/query/healthFactor: get user health factor.
