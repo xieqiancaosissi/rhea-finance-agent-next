@@ -37,16 +37,21 @@ export async function GET(request: NextRequest) {
         { status: 200 }
       );
     }
-    const _res = await ftGetBalance(tokenMetadata.id, accountId);
-    console.log("----------------_res", _res);
-    const balance = toReadableNumber(tokenMetadata.decimals, _res);
-    return NextResponse.json({
-      balance,
-    });
+    return NextResponse.json({ data: tokenMetadata }, { status: 200 });
+    // try {
+    //   const _res = await ftGetBalance(tokenMetadata.id, accountId);
+    //   console.log("----------------_res", _res);
+    //   const balance = toReadableNumber(tokenMetadata.decimals, _res);
+    //   return NextResponse.json({
+    //     balance,
+    //   });
+    // } catch (error) {
+    // }
+    
   } catch (error) {
     console.error("Error balance", error);
     return NextResponse.json(
-      { error: error },
+      { error: "Failed to query balance" },
       { status: 200 }
     );
   }
