@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDexMatchToken } from "@/utils/search-token";
-// import { toReadableNumber } from "@/utils/tools";
-// import { ftGetBalance } from "rhea-dex-swap-sdk";
+import { toReadableNumber } from "@/utils/tools";
+import { ftGetBalance } from "rhea-dex-swap-sdk";
 import { validateParams } from "@/utils/common";
 
 export async function GET(request: NextRequest) {
@@ -37,16 +37,11 @@ export async function GET(request: NextRequest) {
         { status: 200 }
       );
     }
-    return NextResponse.json({ data: tokenMetadata }, { status: 200 });
-    // try {
-    //   const _res = await ftGetBalance(tokenMetadata.id, accountId);
-    //   console.log("----------------_res", _res);
-    //   const balance = toReadableNumber(tokenMetadata.decimals, _res);
-    //   return NextResponse.json({
-    //     balance,
-    //   });
-    // } catch (error) {
-    // }
+    const _res = await ftGetBalance(tokenMetadata.id, accountId);
+    const balance = toReadableNumber(tokenMetadata.decimals, _res);
+    return NextResponse.json({
+      balance,
+    });
     
   } catch (error) {
     console.error("Error balance", error);
