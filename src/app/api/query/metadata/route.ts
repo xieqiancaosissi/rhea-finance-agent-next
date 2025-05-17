@@ -1,7 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
 import { getDexMatchToken } from "@/utils/search-token";
-import { toReadableNumber } from "@/utils/tools";
-import { ftGetTokenMetadata } from "rhea-dex-swap-sdk";
 import { validateParams } from "@/utils/common";
 
 export async function GET(request: NextRequest) {
