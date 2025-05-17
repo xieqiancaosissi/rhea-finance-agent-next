@@ -32,6 +32,7 @@ export async function GET() {
                       /api/query/balance: get token balance.
                       /api/query/dashboard: get user account details or dashboard on lending.
                       /api/query/healthFactor: get user health factor.
+                      /api/query/metadata: get token metadata.
 
                     2. When a user executes a transaction:
                        Get information for a given fungible token or swaps one token for another. 
@@ -807,11 +808,22 @@ export async function GET() {
           },
         },
       },
-      "/api/query/name": {
+      "/api/query/metadata": {
         get: {
-          operationId: "get-name",
+          operationId: "get-token-metadata",
           description:
-            "Get the name",
+            "Get token metadata from Rhea Finance. Token identifiers can be the name, symbol, or contractId and will be fuzzy matched automatically.",
+          parameters: [
+            {
+              name: "token",
+              in: "path",
+              description: "The identifier for the token to get metadata for.",
+              required: true,
+              schema: {
+                type: "string",
+              },
+            },
+          ],
           responses: {
             "200": {
               description: "Successful response",
@@ -819,6 +831,23 @@ export async function GET() {
                 "application/json": {
                   schema: {
                     type: "object",
+                    properties: {
+                      id: {
+                        type: "string",
+                      },
+                      name: {
+                        type: "string",
+                      },
+                      symbol: {
+                        type: "string",
+                      },
+                      decimals: {
+                        type: "number",
+                      },
+                      icon: {
+                        type: "string",
+                      },
+                    },
                   },
                 },
               },
