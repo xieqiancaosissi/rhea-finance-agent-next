@@ -57,7 +57,7 @@ export async function GET() {
                     7. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
 
                     8. If the user query the balance of near or NEAR token, call the /api/query/balance api route.
-                    8. If the user query the metadata of token, call the /api/query/metadata api route.
+                    9. If the user query the metadata of token, call the /api/query/metadata api route.
 
                 `,
         tools: [{ type: "generate-transaction" }],

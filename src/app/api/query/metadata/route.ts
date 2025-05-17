@@ -37,8 +37,7 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json({
       ...tokenMetadata,
-    }); 
-    
+    });
   } catch (error) {
     console.error("Error balance", error);
     return NextResponse.json(

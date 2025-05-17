@@ -42,7 +42,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       balance,
     });
-    
   } catch (error) {
     console.error("Error balance", error);
     return NextResponse.json(
