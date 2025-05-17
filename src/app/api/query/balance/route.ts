@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
 
     console.log("---------token", token);
     console.log("---------accountId", accountId);
+    return NextResponse.json({ data: 'hello' }, { status: 200 });
 
     const errorTip = validateParams([
       {
