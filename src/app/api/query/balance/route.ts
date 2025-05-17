@@ -14,7 +14,6 @@ export async function GET(request: NextRequest) {
 
     console.log("---------token", token);
     console.log("---------accountId", accountId);
-    return NextResponse.json({ data: 'hello' }, { status: 200 });
 
     const errorTip = validateParams([
       {
@@ -47,7 +46,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error balance", error);
     return NextResponse.json(
-      { error: "Failed to query balance" },
+      { error: error },
       { status: 200 }
     );
   }
