@@ -6,7 +6,7 @@ import { fetchAllPools, getTokenPriceList, findPath } from "@/utils/indexer";
 import { toNonDivisibleNumber, toReadableNumber } from "@/utils/tools";
 import { nearDepositTranstion, registerOnToken } from "@/utils/common";
 import { WRAP_NEAR_CONTRACT_ID, REF_FI_CONTRACT_ID } from "@/utils/constant";
-import { ftGetAvaBalance } from "rhea-dex-swap-sdk";
+// import { ftGetAvaBalance } from "rhea-dex-swap-sdk";
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,29 +38,29 @@ export async function GET(request: NextRequest) {
       );
     }
     const amountIn = toNonDivisibleNumber(tokenInData.decimals, quantity!);
-    const isNEAR = tokenInData.id == "wrap.near";
-    const tokenBalance = await ftGetAvaBalance(
-      isNEAR ? "NEAR" : tokenInData.id,
-      accountId
-    );
-    console.log("-------------------------tokenBalance", tokenBalance);
-    const balance = toReadableNumber(tokenInData.decimals, tokenBalance);
-    let availableBalance = balance;
-    if (isNEAR) {
-      availableBalance = Decimal.max(
-        new Decimal(balance || 0).minus(0.2),
-        0
-      ).toFixed(8);
-    }
-    if (new Decimal(quantity || 0).gt(availableBalance)) {
-      return NextResponse.json(
-        {
-          error: "Insufficient Balance",
-          availableBalance,
-        },
-        { status: 200 }
-      );
-    }
+    // const isNEAR = tokenInData.id == "wrap.near";
+    // const tokenBalance = await ftGetAvaBalance(
+    //   isNEAR ? "NEAR" : tokenInData.id,
+    //   accountId
+    // );
+    // console.log("-------------------------tokenBalance", tokenBalance);
+    // const balance = toReadableNumber(tokenInData.decimals, tokenBalance);
+    // let availableBalance = balance;
+    // if (isNEAR) {
+    //   availableBalance = Decimal.max(
+    //     new Decimal(balance || 0).minus(0.2),
+    //     0
+    //   ).toFixed(8);
+    // }
+    // if (new Decimal(quantity || 0).gt(availableBalance)) {
+    //   return NextResponse.json(
+    //     {
+    //       error: "Insufficient Balance",
+    //       availableBalance,
+    //     },
+    //     { status: 200 }
+    //   );
+    // }
 
     const _slippage = getSlippageTolerance(slippage);
     const resultFromServer = await findPath({
