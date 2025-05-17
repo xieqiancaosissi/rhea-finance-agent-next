@@ -24,7 +24,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "redoc": "^2.4.0",
-    "rhea-dex-swap-sdk": "^0.0.3",
+    "rhea-dex-swap-sdk": "^0.0.2",
     "vercel-url": "^0.2.6",
     "viem": "^2.23.15"
   },

@@ -45,8 +45,8 @@ importers:
         specifier: ^2.4.0
         version: 2.4.0(core-js@3.41.0)(mobx@6.13.6)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(styled-components@6.1.15(react-dom@19.0.0(react@19.0.0))(react@19.0.0))
       rhea-dex-swap-sdk:
-        specifier: ^0.0.3
-        version: 0.0.3(react@19.0.0)
+        specifier: ^0.0.2
+        version: 0.0.2(react@19.0.0)
       vercel-url:
         specifier: ^0.2.6
         version: 0.2.6
@@ -2467,8 +2467,8 @@ packages:
     resolution: {integrity: sha512-g6QUff04oZpHs0eG5p83rFLhHeV00ug/Yf9nZM6fLeUrPguBTkTQOdpAWWspMh55TZfVQDPaN3NQJfbVRAxdIw==}
     engines: {iojs: '>=1.0.0', node: '>=0.10.0'}
 
-  rhea-dex-swap-sdk@0.0.3:
-    resolution: {integrity: sha512-Iv8eniny5FAR309cnYkTDUCJ65tc00UvTUD0k2x/Hl50VP/u797KDpBMgMkbkw9WV/qyJTr60o/SHUBZaVc+/Q==}
+  rhea-dex-swap-sdk@0.0.2:
+    resolution: {integrity: sha512-lrGvLWJSQSeZHQAbZpt9q8K78OB8dfpdtU0VgqDUzjuSUlFF3+Kge8aF478SCNK0vjPPE3aVG0oq/Dxyj3/Bwg==}
     engines: {node: '>=10'}
     peerDependencies:
       react: '>=16'
@@ -6037,7 +6037,7 @@ snapshots:
 
   reusify@1.1.0: {}
 
-  rhea-dex-swap-sdk@0.0.3(react@19.0.0):
+  rhea-dex-swap-sdk@0.0.2(react@19.0.0):
     dependencies:
       '@near-wallet-selector/core': 7.9.3(near-api-js@0.44.2)
       '@react-icons/all-files': 4.1.0(react@19.0.0)
