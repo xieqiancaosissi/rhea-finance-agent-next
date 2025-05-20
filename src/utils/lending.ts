@@ -4,7 +4,7 @@ export async function get_health_factor(accountId: string) {
   const { data } = await axios(
     `${BURROW_FINANCE_DOMAIN_URL}/health_factor/${accountId}`
   );
-  return data.data
+  return data.data;
 }
 
 export async function get_account_assets_lending(accountId: string) {

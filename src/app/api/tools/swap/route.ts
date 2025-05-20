@@ -92,8 +92,15 @@ export async function GET(request: NextRequest) {
       });
     });
     const transactions = [];
-    // near deposit
+    // near deposit / near register
     if (tokenInData.id == WRAP_NEAR_CONTRACT_ID) {
+      const _nearRegister = await registerOnToken(
+        accountId,
+        WRAP_NEAR_CONTRACT_ID
+      );
+      if (_nearRegister) {
+        transactions.push(_nearRegister);
+      }
       const _nearDeposit = nearDepositTranstion(accountId, quantity!);
       transactions.push(_nearDeposit);
     }
