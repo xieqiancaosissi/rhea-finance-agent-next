@@ -37,11 +37,19 @@ export async function GET(request: NextRequest) {
         { status: 200 }
       );
     }
-    const _res = await ftGetBalance(tokenMetadata.id, accountId);
-    const balance = toReadableNumber(tokenMetadata.decimals, _res);
-    return NextResponse.json({
-      balance,
-    });
+    try {
+      const _res = await ftGetBalance(tokenMetadata.id, accountId);
+      const balance = toReadableNumber(tokenMetadata.decimals, _res);
+      return NextResponse.json({
+        balance,
+      });
+    } catch (error) {
+      return NextResponse.json(
+        { data: "Failed to query balance", error: JSON.stringify(error), tokenMetadata },
+        { status: 200 }
+      );
+    }
+   
   } catch (error) {
     console.error("Error balance", error);
     return NextResponse.json(
