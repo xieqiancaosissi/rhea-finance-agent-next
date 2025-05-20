@@ -22,10 +22,6 @@ export async function GET(request: NextRequest) {
     const headersList = request.headers;
     const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
     const account_id = mbMetadata?.accountId;
-    console.log("---------token_name", token_id);
-    console.log("---------amount", amount);
-    console.log("---------is_collateral", is_collateral);
-    console.log("---------account_id", account_id);
     const errorTip = validateParams([
       {
         value: account_id,
@@ -54,8 +50,6 @@ export async function GET(request: NextRequest) {
       0,
       Decimal.ROUND_DOWN
     );
-    console.log("---------decimals, token_id", decimals, token_id);
-
     const max_supply_res = await fetch(
       `${RHEA_LENDING_INTERFACE_DOMAIN}/max_supply_balance/${account_id}/${token_id}`,
       {
@@ -86,10 +80,6 @@ export async function GET(request: NextRequest) {
         token_id,
         "0.00125"
       );
-      console.log(
-        "------------------register_token_result",
-        register_token_result
-      );
       if (register_token_result) {
         transactions.push(register_token_result);
       }
@@ -110,7 +100,6 @@ export async function GET(request: NextRequest) {
     const result = await res.json();
     const tx = transferToTranstions(result, account_id);
     transactions.push(tx);
-    console.log("---------transactions-----", transactions);
     return NextResponse.json(transactions);
   } catch (error) {
     console.error("Error supply", error);

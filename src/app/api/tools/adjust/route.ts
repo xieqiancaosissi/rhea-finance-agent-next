@@ -16,10 +16,6 @@ export async function GET(request: NextRequest) {
     const headersList = request.headers;
     const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
     const account_id = mbMetadata?.accountId;
-    console.log("---------token_id", token_id);
-    console.log("---------amount", amount);
-    console.log("---------type", type);
-    console.log("---------account_id", account_id);
     const errorTip = validateParams([
       {
         value: account_id,
@@ -48,7 +44,6 @@ export async function GET(request: NextRequest) {
       0,
       Decimal.ROUND_DOWN
     );
-    console.log("---------decimals, token_id", decimals, token_id);
     const transactions = [];
     const register_tx = await register(account_id as string);
     if (register_tx) {
@@ -96,7 +91,6 @@ export async function GET(request: NextRequest) {
         const result = await res.json();
         const tx = transferToTranstions(result, account_id);
         transactions.push(tx);
-        console.log("---------transactions----increase", result);
         return NextResponse.json(transactions);
       } else if (type == "decrease") {
         if (new Decimal(collateral_data).lt(amount || 0)) {
@@ -141,7 +135,6 @@ export async function GET(request: NextRequest) {
         const result = await res.json();
         const tx = transferToTranstions(result, account_id);
         transactions.push(tx);
-        console.log("---------transactions----decrease", result);
         return NextResponse.json(transactions);
       }
     }

@@ -9,10 +9,6 @@ export async function GET(request: NextRequest) {
     const headersList = request.headers;
     const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
     const accountId = mbMetadata?.accountId;
-
-    console.log("---------token", token);
-    console.log("---------accountId", accountId);
-
     const errorTip = validateParams([
       {
         value: accountId,

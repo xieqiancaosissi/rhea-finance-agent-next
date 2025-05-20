@@ -1,11 +1,25 @@
 import Fuse from "fuse.js";
+import Decimal from "decimal.js";
 import type { IFuseOptions } from "fuse.js";
-
+import { toReadableNumber } from "@/utils/tools";
 import { allowlistedTokens } from "@/utils/allowlist-tokens";
 import type { AllowlistedToken } from "@/utils/allowlist-tokens";
 import { getListToken } from "./indexer";
 import { support_tokens } from "./tokens";
-
+interface IAccountAsset {
+  apr: string;
+  balance: string;
+  shares: string;
+  token_id: string;
+}
+interface IAsset {
+  name: string;
+  symbol: string;
+  icon: string;
+  reference: string;
+  decimals: number;
+  id: string;
+}
 // Create an array of tokens
 const tokens = Object.values(allowlistedTokens);
 
@@ -124,4 +138,52 @@ export async function getDexMatchToken(tokenName: string) {
     ) as AllowlistedToken;
   }
   return tokenMetadata;
+}
+
+export async function processAssets({
+  borrowed,
+  supplied,
+  collateral,
+}: {
+  borrowed: IAccountAsset[];
+  supplied: IAccountAsset[];
+  collateral: IAccountAsset[];
+}) {
+  const tokens = await getListToken();
+  const tokenMap: Record<string, IAsset> = Object.keys(tokens).reduce(
+    (acc: any, token_id) => {
+      const token = tokens[token_id];
+      token.id = token_id;
+      acc[token_id] = token;
+      return acc;
+    },
+    {}
+  );
+  const _borrowed = processUtil(tokenMap, borrowed);
+  const _supplied = processUtil(tokenMap, supplied);
+  const _collateral = processUtil(tokenMap, collateral);
+  return {
+    _borrowed,
+    _supplied,
+    _collateral,
+  };
+}
+
+function processUtil(
+  tokenMap: Record<string, IAsset>,
+  assets: IAccountAsset[]
+) {
+  const _assets = assets.map((asset: IAccountAsset) => {
+    const target = tokenMap[asset.token_id];
+    if (!target) return asset;
+    const decimals = target.decimals >= 18 ? target.decimals : 18;
+    const _balance = toReadableNumber(decimals, asset.balance);
+    const _shares = toReadableNumber(decimals, asset.shares);
+    const _apr = new Decimal(asset.apr || 0).mul(100).toFixed(2);
+    asset.balance = _balance;
+    asset.shares = _shares;
+    asset.apr = _apr + "%";
+    return asset;
+  });
+  return _assets;
 }

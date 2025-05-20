@@ -18,12 +18,6 @@ export async function GET(request: NextRequest) {
     const headersList = request.headers;
     const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
     const accountId = mbMetadata?.accountId;
-    console.log("---------tokenIn", tokenIn);
-    console.log("---------tokenOut", tokenOut);
-    console.log("---------quantity", quantity);
-    console.log("---------slippage", slippage);
-    console.log("---------accountId", accountId);
-
     const [tokenInData, tokenOutData] = await getMatchTokens(
       tokenIn!,
       tokenOut!
@@ -43,7 +37,6 @@ export async function GET(request: NextRequest) {
       isNEAR ? "NEAR" : tokenInData.id,
       accountId
     );
-    console.log("-------------------------tokenBalance", tokenBalance);
     const balance = toReadableNumber(tokenInData.decimals, tokenBalance);
     let availableBalance = balance;
     if (isNEAR) {

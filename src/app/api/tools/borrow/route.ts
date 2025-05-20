@@ -21,9 +21,6 @@ export async function GET(request: NextRequest) {
     const headersList = request.headers;
     const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
     const account_id = mbMetadata?.accountId;
-    console.log("---------token_id", token_id);
-    console.log("---------amount", amount);
-    console.log("---------account_id", account_id);
 
     const errorTip = validateParams([
       {
@@ -53,7 +50,6 @@ export async function GET(request: NextRequest) {
       0,
       Decimal.ROUND_DOWN
     );
-    console.log("---------decimals, token_id", decimals, token_id);
     const max_burrow_res = await fetch(
       `${RHEA_LENDING_INTERFACE_DOMAIN}/max_burrow_balance/${account_id}/${token_id}`,
       {
@@ -64,7 +60,6 @@ export async function GET(request: NextRequest) {
       }
     );
     const max_borrow = await max_burrow_res.json();
-    console.log("-----------------------max_borrow.data", max_borrow.data);
     if (Decimal(max_borrow.data || 0).lt(amount || 0)) {
       return NextResponse.json(
         {
@@ -105,7 +100,6 @@ export async function GET(request: NextRequest) {
         const near_withdraw_tx = nearWithdrawTranstion(account_id, amount!);
         transactions.push(near_withdraw_tx);
       }
-      console.log("---------transactions------", transactions);
       return NextResponse.json(transactions);
     }
   } catch (error) {
