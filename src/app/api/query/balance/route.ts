@@ -45,11 +45,14 @@ export async function GET(request: NextRequest) {
       });
     } catch (error) {
       return NextResponse.json(
-        { data: "Failed to query balance", error: JSON.stringify(error), tokenMetadata },
+        {
+          data: "Failed to query balance",
+          error: JSON.stringify(error),
+          tokenMetadata,
+        },
         { status: 200 }
       );
     }
-   
   } catch (error) {
     console.error("Error balance", error);
     return NextResponse.json(
