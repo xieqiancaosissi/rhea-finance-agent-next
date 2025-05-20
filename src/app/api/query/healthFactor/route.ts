@@ -19,17 +19,10 @@ export async function GET(request: NextRequest) {
     if (errorTip) {
       return NextResponse.json({ data: errorTip }, { status: 200 });
     }
-    try {
-      const health_factor = await get_health_factor(accountId!);
-      return NextResponse.json({
-        health_factor: `${health_factor}%`,
-      });
-    } catch (error) {
-      return NextResponse.json(
-        { data: "Failed to get health factor", error },
-        { status: 200 }
-      );
-    }
+    const health_factor = await get_health_factor(accountId!);
+    return NextResponse.json({
+      health_factor: `${health_factor}%`,
+    });
   } catch (error) {
     console.error("Error get health factor", error);
     return NextResponse.json(
