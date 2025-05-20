@@ -1,9 +1,10 @@
+import axios from "axios";
 import { BURROW_FINANCE_DOMAIN_URL } from "./constant";
 export async function get_health_factor(accountId: string) {
-  const _res = await fetch(
+  const { data } = await axios(
     `${BURROW_FINANCE_DOMAIN_URL}/health_factor/${accountId}`
-  ).then((res) => res.json());
-  return _res?.data;
+  );
+  return data.data
 }
 
 export async function get_account_assets_lending(accountId: string) {
