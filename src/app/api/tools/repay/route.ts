@@ -9,7 +9,7 @@ import {
   transferToTranstions,
   nearDepositTranstion,
 } from "@/utils/common";
-import { getLendingMatchTokens } from "@/utils/search-token";
+import { getLendingMatchToken } from "@/utils/search-token";
 import { LENDING_SUPPORT_TOKENS_TIP } from "@/utils/constant";
 
 export async function GET(request: NextRequest) {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     if (errorTip) {
       return NextResponse.json({ data: errorTip }, { status: 200 });
     }
-    const token = getLendingMatchTokens(token_id!);
+    const token = getLendingMatchToken(token_id!);
     if (!token) {
       return NextResponse.json(
         {
