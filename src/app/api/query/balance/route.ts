@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error balance", error);
     return NextResponse.json(
-      { error: "Failed to query balance" },
+      { data: "Failed to query balance", error },
       { status: 200 }
     );
   }
