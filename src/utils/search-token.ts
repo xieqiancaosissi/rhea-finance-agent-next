@@ -160,12 +160,22 @@ export async function processAssets({
     },
     {}
   );
-  const suppliedWithColla = supplied.map((item) => {
-    const t = collateral.find((c) => c.token_id == item.token_id);
-    if (t) {
-      item.balance = new Decimal(item.balance).plus(t.balance || 0).toFixed(0);
-      item.shares = new Decimal(item.shares).plus(t.shares || 0).toFixed(0);
-      return item;
+  const allDeposit = supplied.concat(collateral);
+  const depositTokenIds = Array.from(
+    new Set(allDeposit.map((item) => item.token_id))
+  );
+  const suppliedWithColla: IAccountAsset[] = depositTokenIds.map((token_id) => {
+    const c: any = collateral.find((c) => c.token_id == token_id);
+    const s: any = supplied.find((s) => s.token_id == token_id);
+    let item;
+    if (c) {
+      item = JSON.parse(JSON.stringify(c));
+      item.balance = new Decimal(c.balance).plus(s?.balance || 0).toFixed(0);
+      item.shares = new Decimal(c.shares).plus(s?.shares || 0).toFixed(0);
+    } else if (s) {
+      item = JSON.parse(JSON.stringify(s));
+      item.balance = new Decimal(s.balance).plus(c?.balance || 0).toFixed(0);
+      item.shares = new Decimal(s.shares).plus(c?.shares || 0).toFixed(0);
     }
     return item;
   });
