@@ -11,6 +11,7 @@ interface IAccountAsset {
   balance: string;
   shares: string;
   token_id: string;
+  symbol: string;
 }
 interface IAsset {
   name: string;
@@ -192,6 +193,7 @@ function processUtil(
     asset.balance = _balance;
     asset.shares = _shares;
     asset.apr = _apr + "%";
+    asset.symbol = target.symbol;
     return asset;
   });
   return _assets;
