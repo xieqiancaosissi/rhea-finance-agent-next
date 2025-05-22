@@ -1,4 +1,8 @@
-import { INDEXER_DOMAIN_URL, SMART_ROUTER_DOMAIN_URL } from "./constant";
+import {
+  INDEXER_DOMAIN_URL,
+  SMART_ROUTER_DOMAIN_URL,
+  API_DATA_SERVICE_DOMAIN_URL,
+} from "./constant";
 export async function getListToken() {
   const list_token = await fetch(`${INDEXER_DOMAIN_URL}/list-token`).then(
     (res) => res.json()
@@ -46,4 +50,21 @@ export async function fetchUserPoints(accountId: string) {
     trade_points: res.data.trade_points,
     total_points: res.data.total_points,
   };
+}
+export async function fetchTopTokens() {
+  const res = await fetch(
+    `${API_DATA_SERVICE_DOMAIN_URL}/overview/list_top_tokens`
+  ).then((res) => res.json());
+  const list = res.map((t: any) => {
+    const newT: any = {};
+    newT.token = t.token_id;
+    newT.symbol = t.symbol;
+    newT.price = t.price;
+    newT.volume24h = t.volume24h;
+    newT.tvl = t.tvl;
+    newT.amount = t.amount;
+    newT.rank = t.rank;
+    return newT;
+  });
+  return list;
 }
