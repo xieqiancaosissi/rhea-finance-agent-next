@@ -1,6 +1,6 @@
 # Bitte AI Agent NextJS Template
 
-This template provides a starting point for creating AI agents using the Bitte Protocol with Next.js. It includes pre-configured endpoints and tools that demonstrate common agent functionalities.
+This template provides a starting point for creating AI agents using the Bitte Protocol with Next.js. It includes pre-configured endpoints and tools that demonstrate common agent functionalities
 
 ## Features
 
