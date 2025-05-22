@@ -6,5 +6,6 @@ export const SMART_ROUTER_DOMAIN_URL = "https://smartrouter.ref.finance";
 export const BURROW_FINANCE_DOMAIN_URL = "https://api.burrow.finance";
 export const API_DATA_SERVICE_DOMAIN_URL =
   "https://api.data-service.burrow.finance";
+export const API_FASTERNEAR_DOMAIN_URL = "https://api.fastnear.com";
 export const LENDING_SUPPORT_TOKENS_TIP =
   "Token is not supported. Currently supported tokens are BRRR, DAI,USDT.e,USDC.e,NEAR,STNEAR,WBTC,AURORA,LINEAR,USDt,USDC,FRAX,NBTC,ZEC,ETH";

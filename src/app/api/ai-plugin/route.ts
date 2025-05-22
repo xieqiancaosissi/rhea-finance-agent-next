@@ -30,7 +30,7 @@ export async function GET() {
                       /api/tools/withdraw: withdraw token.
                       /api/tools/swap: swaps token.
                       /api/query/balance: get token balance.
-                      /api/query/dashboard: get user account details or dashboard on lending.
+                      /api/query/dashboard: get user account details or dashboard on lending or The current user has all token balances.
                       /api/query/healthFactor: get user health factor.
                       /api/query/metadata: get token metadata.
                       /api/query/points: get user points and show more about points.
@@ -783,7 +783,7 @@ export async function GET() {
         get: {
           operationId: "get-user-dashboard",
           description:
-            "Get the user account details or dashboard on the lending finance",
+            "get user account details or dashboard on lending or The current user has all token balances",
           responses: {
             "200": {
               description: "Successful response",

@@ -1,8 +1,19 @@
+import Decimal from "decimal.js";
 import {
   INDEXER_DOMAIN_URL,
   SMART_ROUTER_DOMAIN_URL,
   API_DATA_SERVICE_DOMAIN_URL,
+  API_FASTERNEAR_DOMAIN_URL,
 } from "./constant";
+import { toReadableNumber } from "rhea-dex-swap-sdk";
+interface IAsset {
+  name: string;
+  symbol: string;
+  icon: string;
+  reference: string;
+  decimals: number;
+  id: string;
+}
 export async function getListToken() {
   const list_token = await fetch(`${INDEXER_DOMAIN_URL}/list-token`).then(
     (res) => res.json()
@@ -67,4 +78,34 @@ export async function fetchTopTokens() {
     return newT;
   });
   return list;
+}
+export async function fetchUserTokens(accountId: string) {
+  const res = await fetch(
+    `${API_FASTERNEAR_DOMAIN_URL}/v1/account/${accountId}/ft`
+  ).then((res) => res.json());
+  const tokenList = res.tokens;
+  const tokenListWithBalance = tokenList.filter((t: any) =>
+    new Decimal(t.balance || 0).gt(0)
+  );
+  const tokens = await getListToken();
+  const tokenMap: Record<string, IAsset> = Object.keys(tokens).reduce(
+    (acc: any, token_id) => {
+      const token = tokens[token_id];
+      token.id = token_id;
+      acc[token_id] = token;
+      return acc;
+    },
+    {}
+  );
+  const userTokens = tokenListWithBalance.map((t: any) => {
+    const token = tokenMap[t.contract_id];
+    if (!token) return t;
+    const balance = toReadableNumber(token.decimals, t.balance);
+    return {
+      balance,
+      symbol: token.symbol,
+      token: token.id,
+    };
+  });
+  return userTokens;
 }

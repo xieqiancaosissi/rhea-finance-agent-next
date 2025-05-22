@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import { validateParams } from "@/utils/common";
 import { get_account_assets_lending } from "@/utils/lending";
 import { processAssets } from "@/utils/search-token";
+import { fetchUserTokens } from "@/utils/indexer";
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,10 +24,14 @@ export async function GET(request: NextRequest) {
       supplied: dashboard_assets?.supplied || [],
       collateral: dashboard_assets?.collateral || [],
     });
+    const userTokens = await fetchUserTokens(accountId);
     return NextResponse.json({
-      borrowed: _borrowed,
-      supplied: _supplied,
-      collateral: _collateral,
+      dashboard_on_lending: {
+        borrowed: _borrowed,
+        supplied: _supplied,
+        collateral: _collateral,
+      },
+      userTokens,
     });
   } catch (error) {
     console.error("Error get account data", error);
