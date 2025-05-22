@@ -34,6 +34,7 @@ export async function GET() {
                       /api/query/healthFactor: get user health factor.
                       /api/query/metadata: get token metadata.
                       /api/query/points: get user points and show more about points.
+                      /api/query/tokenDetail: Get the supply apy and borrow apy of the token, and whether it is an incentive token on Lending finance.
 
                     2. When a user executes a transaction:
                        Get information for a given fungible token or swaps one token for another. 
@@ -878,6 +879,40 @@ export async function GET() {
           operationId: "get-user-points",
           description:
             "Get the user's current points on rhea finance and provide a link for the user to learn more about points",
+          responses: {
+            "200": {
+              description: "Successful response",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                  },
+                },
+              },
+            },
+            "400": {
+              description: "Bad request",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      error: {
+                        type: "string",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      "/api/query/tokenDetail": {
+        get: {
+          operationId: "get-token-detail",
+          description:
+            "Get the supply apy, borrow apy of all tokens, and whether it is an incentive token.",
           responses: {
             "200": {
               description: "Successful response",
