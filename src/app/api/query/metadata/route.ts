@@ -6,16 +6,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const token = searchParams.get("token");
-    const headersList = request.headers;
-    const mbMetadata = JSON.parse(headersList.get("mb-metadata") || "{}");
-    const accountId = mbMetadata?.accountId;
     const errorTip = validateParams([
       {
-        value: accountId,
-        errorTip: "Need to log in first",
-      },
-      {
-        value: token,
+        value: token!,
         errorTip: "token_id parameter is required",
       },
     ]);
@@ -35,9 +28,9 @@ export async function GET(request: NextRequest) {
       ...tokenMetadata,
     });
   } catch (error) {
-    console.error("Error balance", error);
+    console.error("Error metadata", error);
     return NextResponse.json(
-      { error: "Failed to query balance" },
+      { error: "Failed to query metadata" },
       { status: 200 }
     );
   }

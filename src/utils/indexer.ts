@@ -35,3 +35,15 @@ export async function findPath({
   });
   return res;
 }
+
+export async function fetchUserPoints(accountId: string) {
+  const res = await fetch(
+    `${INDEXER_DOMAIN_URL}/v3/points/user?addr=${accountId}`
+  ).then((res) => res.json());
+  return {
+    last_liquidity_points: res.data.last_liquidity_points,
+    liquidity_points: res.data.liquidity_points,
+    trade_points: res.data.trade_points,
+    total_points: res.data.total_points,
+  };
+}

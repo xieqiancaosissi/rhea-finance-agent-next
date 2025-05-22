@@ -33,6 +33,7 @@ export async function GET() {
                       /api/query/dashboard: get user account details or dashboard on lending.
                       /api/query/healthFactor: get user health factor.
                       /api/query/metadata: get token metadata.
+                      /api/query/points: get user points and show more about points.
 
                     2. When a user executes a transaction:
                        Get information for a given fungible token or swaps one token for another. 
@@ -850,6 +851,40 @@ export async function GET() {
                         type: "string",
                       },
                     },
+                  },
+                },
+              },
+            },
+            "400": {
+              description: "Bad request",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    properties: {
+                      error: {
+                        type: "string",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      "/api/query/points": {
+        get: {
+          operationId: "get-user-points",
+          description:
+            "Get the user's current points on rhea finance and provide a link for the user to learn more about points",
+          responses: {
+            "200": {
+              description: "Successful response",
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
                   },
                 },
               },
