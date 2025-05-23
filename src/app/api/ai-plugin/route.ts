@@ -69,7 +69,7 @@ export async function GET() {
 
                     12. If the user query the balance of near or NEAR token, call the /api/query/balance api route.
                 `,
-        tools: [{ type: "generate-transaction" }],
+        tools: [{ type: "generate-transaction" }, { type: "submit-query" }],
         image: "https://img.ref.finance/images/rhea_logo_svg.svg",
       },
     },
@@ -882,7 +882,7 @@ export async function GET() {
       },
       "/api/query/points": {
         get: {
-          operationId: "get-user-points",
+          operationId: "get-points",
           description:
             "Get the user's current points on rhea finance and provide a link for the user to learn more about points",
           responses: {
