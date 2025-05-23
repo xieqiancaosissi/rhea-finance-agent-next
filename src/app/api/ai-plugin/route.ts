@@ -63,6 +63,12 @@ export async function GET() {
                     
                     9. If the user query the metadata of token, call the /api/query/metadata api route.
 
+                    10. When the user asks for information about points, call the /api/query/points api route.
+
+                    11. When the user asks for information about apy, call the /api/query/tokenDetail api route.
+
+                    12. When users ask for information about top popular tokens, call the /api/query/topTokenDetail api route.
+
                 `,
         tools: [{ type: "generate-transaction" }],
         image: "https://img.ref.finance/images/rhea_logo_svg.svg",
