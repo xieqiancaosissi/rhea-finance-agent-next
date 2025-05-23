@@ -33,7 +33,7 @@ export async function GET() {
                       /api/query/dashboard: get user account details or dashboard on lending or The current user has all token balances.
                       /api/query/healthFactor: get user health factor.
                       /api/query/metadata: get token metadata.
-                      /api/query/points: get user points and show more about points.
+                      /api/query/points: Introducing points, you can also query the user's points information on rhea finance.
                       /api/query/tokenDetail: Get the supply apy and borrow apy of the token, and whether it is an incentive token on Lending finance.
                       /api/query/topTokenDetail: Get the details of the most famous, top-ranked, and most popular tokens on the rhea finance platform: tvl, 24-hour trading volume, price, and total quantity.
 
