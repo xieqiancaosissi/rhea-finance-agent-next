@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     });
     const userTokens = await fetchUserTokens(accountId);
     return NextResponse.json({
-      dashboard_on_lending: {
+      dashboard_lending: {
         borrowed: _borrowed,
         supplied: _supplied,
         collateral: _collateral,

@@ -41,34 +41,33 @@ export async function GET() {
                        Get information for a given fungible token or swaps one token for another. 
                        Do not modify token identifiers, they will be fuzzy matched automatically.
 
-                    3. If the user supplies a token and does not specify whether collateral is required, 
+                    3. If the user query the metadata of token, call the /api/query/metadata api route.
+
+                    4. When the user asks for information about points, call the /api/query/points api route.
+
+                    5. When the user asks for information about apy, call the /api/query/tokenDetail api route.
+
+                    6. When users ask for information about top popular tokens, call the /api/query/topTokenDetail api route.
+
+                    7. If the user supplies a token and does not specify whether collateral is required, 
                        the user is prompted to select whether collateral is required.
                        except BRRR, and BRRR can only be false.
 
-                    4. If the user want to repay and the user does not specify the repay type, tell the user which repay method to choose. 
+                    8. If the user want to repay and the user does not specify the repay type, tell the user which repay method to choose. 
                        There are two options: wallet and supplied.
 
-                    5. If the user wants to adjust the collateral of the token and no adjustment way is specified, tell the user
+                    9. If the user wants to adjust the collateral of the token and no adjustment way is specified, tell the user
                        There are two options: increase and decrease. 
                    
-                    6. Interface parameter prompt rules:
+                    10. Interface parameter prompt rules:
                        The user input information needs to be strictly checked. If the interface requires parameters, 
                        the current user does not provide,that is,
                        the parameters of required:true, the user must be prompted to provide the corresponding data, 
                        otherwise the transaction cannot be generated.    
 
-                    7. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
+                    11. If the user does not provide the amount of tokens to be operated, the user is prompted to provide.
 
-                    8. If the user query the balance of near or NEAR token, call the /api/query/balance api route.
-                    
-                    9. If the user query the metadata of token, call the /api/query/metadata api route.
-
-                    10. When the user asks for information about points, call the /api/query/points api route.
-
-                    11. When the user asks for information about apy, call the /api/query/tokenDetail api route.
-
-                    12. When users ask for information about top popular tokens, call the /api/query/topTokenDetail api route.
-
+                    12. If the user query the balance of near or NEAR token, call the /api/query/balance api route.
                 `,
         tools: [{ type: "generate-transaction" }],
         image: "https://img.ref.finance/images/rhea_logo_svg.svg",
